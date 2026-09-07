@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python: индексы, срезы, методы строк и while True — тренажёр</title>
+<style>
+:root{
+  --bg:#E9EEF4; --rule:#D5DDE8; --paper:#FFFFFF;
+  --ink:#16243C; --ink2:#56637A; --link:#2A4A7F;
+  --ok:#1B6B45; --ok-bg:#E7F2EB; --ok-rule:#A9CFBB;
+  --no:#A93325; --no-bg:#FAEAE7; --no-rule:#E5B7AF;
+  --mark:#FFE9A8; --term-bg:#1B2434; --term-fg:#E4EBF4;
+  --code-bg:#F3F6FA;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:16px/1.6 system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif; font-weight:600; line-height:1.25; margin:0}
+code,pre,textarea,.mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace}
+code{background:var(--code-bg); padding:.08em .3em; border-radius:3px; font-size:.92em}
+.wrap{max-width:900px; margin:0 auto; padding:0 16px 80px}
+.hero{background:var(--paper); border:1px solid var(--rule); border-top:none; padding:28px 32px 24px}
+.hero h1{font-size:30px; letter-spacing:-.01em}
+.hero p{margin:8px 0 0; color:var(--ink2); max-width:62ch}
+.demo{display:grid; grid-template-columns:1fr 1fr; margin-top:22px; border:1px solid var(--rule)}
+.demo pre{margin:0; padding:14px 16px; font-size:13.5px; overflow-x:auto; background:var(--code-bg)}
+.demo .out{margin:0; padding:14px 16px; font-size:13.5px; background:var(--term-bg); color:var(--term-fg); white-space:pre-wrap}
+.demo .cap{grid-column:1/-1; border-top:1px solid var(--rule); padding:8px 16px; font-size:13px; color:var(--ink2); background:var(--paper)}
+@media(max-width:640px){.demo{grid-template-columns:1fr}}
+.bar{position:sticky; top:0; z-index:9; background:var(--paper); border:1px solid var(--rule); border-top:none;
+     padding:10px 32px; display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.bar .score{font-size:14px; color:var(--ink2); white-space:nowrap}
+.bar .score b{color:var(--ink); font-size:16px}
+.track{flex:1 1 160px; height:8px; background:var(--code-bg); border:1px solid var(--rule); position:relative; overflow:hidden}
+.track i{position:absolute; inset:0 auto 0 0; width:0; background:var(--ok); transition:width .25s}
+nav{display:flex; gap:5px; flex-wrap:wrap; width:100%}
+nav button{font:13px/1 inherit; font-family:inherit; padding:7px 9px; background:transparent; color:var(--ink2); border:1px solid transparent; border-radius:3px; cursor:pointer}
+nav button:hover{background:var(--code-bg); color:var(--ink)}
+nav button[aria-current="true"]{background:var(--ink); color:#fff}
+nav button .dot{display:inline-block; min-width:1.6em; text-align:right; opacity:.7; font-size:12px; margin-left:4px}
+section{display:none} section.on{display:block}
+.sheet{background:var(--paper); border:1px solid var(--rule); border-top:none; padding:26px 32px}
+.chapter-head h2{font-size:23px}
+.chapter-head p{margin:4px 0 0; color:var(--ink2)}
+.theory{margin:18px 0 26px; background:var(--code-bg); border:1px solid var(--rule); padding:16px 18px}
+.theory h3{font-size:15px; font-family:inherit; font-weight:700; margin-bottom:8px}
+.theory ul{margin:0; padding-left:18px} .theory li{margin:5px 0}
+.theory .k{background:var(--mark); padding:.05em .25em}
+.theory pre{margin:8px 0 0; font-size:13px; background:var(--paper); border:1px solid var(--rule); padding:10px 12px; line-height:1.5}
+.task{border:1px solid var(--rule); border-left:3px solid var(--ink2); padding:16px 18px; margin:0 0 16px; background:var(--paper)}
+.task.done{border-left-color:var(--ok); background:#FCFEFD}
+.task.seen{border-left-color:#B9A24A}
+.t-head{display:flex; gap:10px; align-items:baseline; margin-bottom:8px}
+.t-num{font:600 13px/1 Georgia,serif; color:var(--ink2); white-space:nowrap; padding-top:3px}
+.t-kind{font-size:12px; color:var(--ink2); border:1px solid var(--rule); padding:2px 6px; border-radius:3px; white-space:nowrap}
+.t-q{margin:0} .t-q pre{margin:10px 0 0}
+pre.code{background:var(--code-bg); border:1px solid var(--rule); padding:12px 14px; margin:12px 0; overflow-x:auto; font-size:13.5px; line-height:1.55}
+pre.code .ln{color:var(--ink2); user-select:none}
+.given{border-left:3px solid var(--rule); padding:10px 12px; background:var(--code-bg); margin:12px 0; font-size:13px}
+.given .lbl{display:block; font-size:12px; color:var(--ink2); margin-bottom:5px; font-family:system-ui,sans-serif}
+.given pre{margin:0; font-size:13.5px; white-space:pre-wrap}
+textarea{width:100%; border:1px solid var(--rule); padding:10px 12px; font-size:13.5px; line-height:1.55; tab-size:4; background:var(--paper); color:var(--ink); resize:vertical; border-radius:0}
+textarea:focus, button:focus-visible, .opt:focus-visible{outline:2px solid var(--link); outline-offset:1px}
+.answer-box{width:100%; min-height:80px}
+.opts{list-style:none; margin:10px 0 0; padding:0; display:grid; gap:6px}
+.opt{display:flex; gap:10px; align-items:flex-start; width:100%; text-align:left; font:15px/1.5 inherit; padding:9px 12px; cursor:pointer; background:var(--paper); border:1px solid var(--rule); color:var(--ink)}
+.opt code{font-size:.95em; background:transparent; padding:0}
+.opt:hover{background:var(--code-bg)}
+.opt[aria-pressed="true"],.opt[aria-checked="true"]{border-color:var(--link); box-shadow:inset 3px 0 0 var(--link); background:#F5F8FC}
+.opt.right{border-color:var(--ok-rule); background:var(--ok-bg); box-shadow:inset 3px 0 0 var(--ok)}
+.opt.wrong{border-color:var(--no-rule); background:var(--no-bg); box-shadow:inset 3px 0 0 var(--no)}
+.opt.missed{border-color:var(--ok-rule); border-style:dashed}
+.opt .mk{font-family:ui-monospace,monospace; color:var(--ink2); flex:0 0 auto}
+.opt .box{flex:0 0 auto; width:16px; height:16px; border:1.5px solid var(--ink2); border-radius:3px; margin-top:5px; position:relative}
+.opt[aria-checked="true"] .box{background:var(--link); border-color:var(--link)}
+.opt[aria-checked="true"] .box::after{content:""; position:absolute; left:4px; top:1px; width:5px; height:9px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg)}
+.acts{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; align-items:center}
+button.b{font:14px/1 inherit; font-family:inherit; padding:9px 14px; border:1px solid var(--ink); background:var(--ink); color:#fff; cursor:pointer; border-radius:3px}
+button.b:hover{background:#233657}
+button.g{background:transparent; color:var(--ink); border-color:var(--rule)} button.g:hover{background:var(--code-bg)}
+button.b:disabled{opacity:.45; cursor:default}
+.term{background:var(--term-bg); color:var(--term-fg); padding:11px 13px; margin-top:10px; font-size:13.5px; white-space:pre-wrap; word-break:break-word; overflow-x:auto}
+.term .err{color:#FF9C8A} .term .muted{color:#93A3B8}
+.verdict{margin-top:12px; padding:11px 13px; border:1px solid var(--rule); font-size:14.5px}
+.verdict.ok{background:var(--ok-bg); border-color:var(--ok-rule)}
+.verdict.no{background:var(--no-bg); border-color:var(--no-rule)}
+.verdict .why{margin-top:7px; color:var(--ink2); font-size:14px}
+.cmp{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:9px}
+@media(max-width:560px){.cmp{grid-template-columns:1fr}}
+.cmp div{background:var(--paper); border:1px solid var(--rule); padding:8px 10px}
+.cmp .lbl{font-size:12px; color:var(--ink2); display:block; margin-bottom:4px}
+.cmp pre{margin:0; font-size:13px; white-space:pre-wrap; min-height:1.2em}
+.pager{display:flex; justify-content:space-between; gap:10px; margin-top:24px; padding-top:18px; border-top:1px solid var(--rule)}
+.total{font:600 46px/1 Georgia,serif; margin:6px 0 2px} .total span{font-size:22px; color:var(--ink2)}
+.rows{margin-top:22px; border-top:1px solid var(--rule)}
+.row{display:grid; grid-template-columns:1fr 96px 58px; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--rule)}
+.row .mini{height:7px; background:var(--code-bg); border:1px solid var(--rule); position:relative}
+.row .mini i{position:absolute; inset:0 auto 0 0; background:var(--ok)}
+.row .cnt{text-align:right; font-size:14px; color:var(--ink2)}
+.todo{margin-top:20px; font-size:14.5px; color:var(--ink2)}
+.todo button{font:inherit; font-size:13px; padding:4px 8px; margin:3px 4px 0 0; background:var(--code-bg); border:1px solid var(--rule); cursor:pointer; border-radius:3px; color:var(--ink)}
+footer{color:var(--ink2); font-size:13px; padding:18px 32px; background:var(--paper); border:1px solid var(--rule); border-top:none}
+@media(max-width:640px){.hero,.sheet,.bar,footer{padding-left:16px; padding-right:16px} .hero h1{font-size:24px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>Строки, срезы и цикл до стоп-слова</h1>
+    <p>65 заданий: индексы и срезы, методы строк, регистр, f-строки, split и join,
+       цикл <code>while True</code> с <code>break</code>, логические выражения и поиск ошибок
+       в нумерованном коде — в формате демоверсии. Код запускается прямо на странице.</p>
+    <div class="demo">
+<pre>s = []
+while True:
+    word = input()
+    if word == 'СТОП СЛОВО':
+        break
+    if word.isalpha():
+        s.append(word.capitalize())
+print(", ".join(s[::-1]))</pre>
+<pre class="out">&gt; яблоко
+&gt; 2026
+&gt; гРУША
+&gt; СТОП СЛОВО
+Груша, Яблоко</pre>
+      <div class="cap">Восемь строк — и в них уже почти вся тема: цикл со стоп-словом, проверка, регистр, срез, join.</div>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="score">Верных ответов: <b><span id="score">0</span> из <span id="total">0</span></b></div>
+    <div class="track"><i id="fill"></i></div>
+    <nav id="nav"></nav>
+  </div>
+
+  <main id="main"></main>
+
+  <footer>
+    На странице работает встроенный интерпретатор подмножества Python: строки и списки, индексы и срезы,
+    методы строк и списков, <code>print</code>, f-строки, <code>if / elif / else</code>, <code>while</code>,
+    <code>for</code>, <code>range</code>, <code>input()</code>. Функции (<code>def</code>) не поддерживаются.
+    Сообщения об ошибках — по-русски, но с настоящими именами исключений Python.
+  </footer>
+</div>
+
+<script>
+/* pymini.js — крошечный интерпретатор подмножества Python для тренажёра.
+   Поддержка: int/float/str/bool/None/list, print, f-строки, if/elif/else,
+   ==/!=/</>/<=/>=, and/or/not, in/not in, арифметика, приведение типов,
+   методы строк, input(). */
+(function (global) {
+  'use strict';
+
+  /* ---------------- значения ---------------- */
+  const mkInt = v => ({ k: 'int', v: Math.trunc(v) });
+  const mkFloat = v => ({ k: 'float', v: v });
+  const mkStr = v => ({ k: 'str', v: v });
+  const mkBool = v => ({ k: 'bool', v: !!v });
+  const NONE = { k: 'none' };
+  const mkList = a => ({ k: 'list', v: a });
+
+  function PyErr(name, msg) {
+    const e = new Error(msg);
+    e.pyName = name;
+    e.isPy = true;
+    return e;
+  }
+
+  function typeName(x) {
+    switch (x.k) {
+      case 'int': return 'int';
+      case 'float': return 'float';
+      case 'str': return 'str';
+      case 'bool': return 'bool';
+      case 'none': return 'NoneType';
+      case 'list': return x.rng ? 'range' : 'list';
+      case 'type': return 'type';
+      case 'method': return 'builtin_function_or_method';
+      default: return 'builtin_function_or_method';
+    }
+  }
+
+  function floatStr(v) {
+    if (Number.isNaN(v)) return 'nan';
+    if (v === Infinity) return 'inf';
+    if (v === -Infinity) return '-inf';
+    if (Number.isInteger(v) && Math.abs(v) < 1e16) return v.toFixed(1);
+    let s = String(v);
+    if (s.includes('e')) {
+      // Python: 1e+20, 1e-05
+      s = s.replace('e+', 'e+').replace(/e([+-])(\d)$/, 'e$10$2');
+    }
+    return s;
+  }
+
+  function pyStr(x) {
+    switch (x.k) {
+      case 'int': return String(x.v);
+      case 'float': return floatStr(x.v);
+      case 'str': return x.v;
+      case 'bool': return x.v ? 'True' : 'False';
+      case 'none': return 'None';
+      case 'list':
+        if (x.rng) return 'range(' + x.rng[0] + ', ' + x.rng[1] + (x.rng[2] !== 1 ? ', ' + x.rng[2] : '') + ')';
+        return '[' + x.v.map(pyRepr).join(', ') + ']';
+      case 'type': return "<class '" + x.name + "'>";
+      case 'method': return '<built-in method ' + x.name + ' of ' + typeName(x.self) + ' object>';
+      default: return '<built-in function ' + (x.name || '?') + '>';
+    }
+  }
+
+  function pyRepr(x) {
+    if (x.k === 'str') return "'" + x.v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+    return pyStr(x);
+  }
+
+  function truthy(x) {
+    switch (x.k) {
+      case 'int': case 'float': return x.v !== 0;
+      case 'bool': return x.v;
+      case 'str': return x.v.length > 0;
+      case 'none': return false;
+      case 'list': return x.v.length > 0;
+      default: return true;
+    }
+  }
+
+  const isNum = x => x.k === 'int' || x.k === 'float' || x.k === 'bool';
+  const numVal = x => (x.k === 'bool' ? (x.v ? 1 : 0) : x.v);
+  const isIntLike = x => x.k === 'int' || x.k === 'bool';
+
+  /* ---------------- лексер ---------------- */
+  const OPS = ['**', '//', '==', '!=', '<=', '>=', '+=', '-=', '*=', '/=',
+    '=', '+', '-', '*', '/', '%', '<', '>', '(', ')', '[', ']', ',', ':', '.'];
+  const KW = new Set(['if', 'elif', 'else', 'and', 'or', 'not', 'in', 'is',
+    'True', 'False', 'None', 'pass', 'while', 'for', 'def', 'import',
+    'return', 'break', 'continue', 'class', 'try', 'except', 'lambda',
+    'global', 'with', 'del', 'from', 'as']);
+
+  function tokenize(line, ln) {
+    const t = [];
+    let i = 0;
+    const n = line.length;
+    while (i < n) {
+      const c = line[i];
+      if (c === ' ' || c === '\t' || c === '\r') { i++; continue; }
+      if (c === '#') break;
+      // строки (с возможным префиксом f/r)
+      let pfx = '';
+      let j = i;
+      if (/[fFrR]/.test(c) && (line[i + 1] === '"' || line[i + 1] === "'")) {
+        pfx = c.toLowerCase(); j = i + 1;
+      } else if (/[fF]/.test(c) && /[rR]/.test(line[i + 1] || '') &&
+        (line[i + 2] === '"' || line[i + 2] === "'")) {
+        pfx = 'f'; j = i + 2;
+      }
+      if (line[j] === '"' || line[j] === "'") {
+        const q = line[j];
+        let k = j + 1, raw = '';
+        while (k < n) {
+          if (line[k] === '\\' && k + 1 < n) { raw += line[k] + line[k + 1]; k += 2; continue; }
+          if (line[k] === q) break;
+          raw += line[k]; k++;
+        }
+        if (k >= n) throw PyErr('SyntaxError', 'строка ' + ln + ': не закрыта кавычка ' + q);
+        i = k + 1;
+        if (pfx === 'f') t.push({ t: 'fstr', raw: raw, ln: ln });
+        else t.push({ t: 'str', v: unescapeStr(raw, ln), ln: ln });
+        continue;
+      }
+      // числа
+      if (/[0-9]/.test(c) || (c === '.' && /[0-9]/.test(line[i + 1] || ''))) {
+        let k = i, seenDot = false, seenE = false;
+        while (k < n) {
+          const ch = line[k];
+          if (/[0-9_]/.test(ch)) { k++; continue; }
+          if (ch === '.' && !seenDot && !seenE) { seenDot = true; k++; continue; }
+          if ((ch === 'e' || ch === 'E') && !seenE && /[0-9]/.test(line[k + 1] || '') ) { seenE = true; k++; continue; }
+          break;
+        }
+        const raw = line.slice(i, k).replace(/_/g, '');
+        i = k;
+        t.push({ t: 'num', v: parseFloat(raw), isInt: !seenDot && !seenE, ln: ln });
+        continue;
+      }
+      // имена
+      if (/[A-Za-zА-Яа-яЁё_]/.test(c)) {
+        let k = i;
+        while (k < n && /[A-Za-zА-Яа-яЁё0-9_]/.test(line[k])) k++;
+        const w = line.slice(i, k);
+        i = k;
+        t.push({ t: KW.has(w) ? 'kw' : 'name', v: w, ln: ln });
+        continue;
+      }
+      const op = OPS.find(o => line.startsWith(o, i));
+      if (op) { t.push({ t: 'op', v: op, ln: ln }); i += op.length; continue; }
+      throw PyErr('SyntaxError', 'строка ' + ln + ": непонятный символ '" + c + "'");
+    }
+    return t;
+  }
+
+  function unescapeStr(raw, ln) {
+    let s = '';
+    for (let i = 0; i < raw.length; i++) {
+      if (raw[i] === '\\') {
+        const c = raw[++i];
+        if (c === 'n') s += '\n';
+        else if (c === 't') s += '\t';
+        else if (c === '\\') s += '\\';
+        else if (c === "'") s += "'";
+        else if (c === '"') s += '"';
+        else s += '\\' + (c === undefined ? '' : c);
+      } else s += raw[i];
+    }
+    return s;
+  }
+
+  /* --- разбор f-строки на части --- */
+  function splitFString(raw, ln) {
+    const parts = [];
+    let lit = '';
+    for (let i = 0; i < raw.length; i++) {
+      const c = raw[i];
+      if (c === '{') {
+        if (raw[i + 1] === '{') { lit += '{'; i++; continue; }
+        let depth = 0, j = i + 1, inner = '', quote = null;
+        while (j < raw.length) {
+          const ch = raw[j];
+          if (quote) {
+            inner += ch;
+            if (ch === quote) quote = null;
+            j++; continue;
+          }
+          if (ch === '"' || ch === "'") { quote = ch; inner += ch; j++; continue; }
+          if ('([' .includes(ch)) depth++;
+          if (')]'.includes(ch)) depth--;
+          if (ch === '}' && depth === 0) break;
+          inner += ch; j++;
+        }
+        if (j >= raw.length) throw PyErr('SyntaxError', 'строка ' + ln + ': в f-строке не закрыта {');
+        i = j;
+        // отделяем спецификатор формата
+        let spec = '', expr = inner, d = 0, q = null;
+        for (let p = 0; p < inner.length; p++) {
+          const ch = inner[p];
+          if (q) { if (ch === q) q = null; continue; }
+          if (ch === '"' || ch === "'") { q = ch; continue; }
+          if ('(['.includes(ch)) d++;
+          if (')]'.includes(ch)) d--;
+          if (ch === ':' && d === 0) { expr = inner.slice(0, p); spec = inner.slice(p + 1); break; }
+        }
+        if (lit) { parts.push({ lit: unescapeStr(lit, ln) }); lit = ''; }
+        if (!expr.trim()) throw PyErr('SyntaxError', 'строка ' + ln + ': пустые {} в f-строке');
+        parts.push({ src: expr, spec: spec, ln: ln });
+        continue;
+      }
+      if (c === '}') {
+        if (raw[i + 1] === '}') { lit += '}'; i++; continue; }
+        throw PyErr('SyntaxError', 'строка ' + ln + ": одиночная '}' в f-строке");
+      }
+      lit += c;
+    }
+    if (lit) parts.push({ lit: unescapeStr(lit, ln) });
+    return parts;
+  }
+
+  /* ---------------- парсер выражений ---------------- */
+  function Parser(tokens) { this.t = tokens; this.i = 0; }
+  Parser.prototype.peek = function (o) { return this.t[this.i + (o || 0)]; };
+  Parser.prototype.next = function () { return this.t[this.i++]; };
+  Parser.prototype.at = function (t, v) {
+    const x = this.peek();
+    return x && x.t === t && (v === undefined || x.v === v);
+  };
+  Parser.prototype.eat = function (t, v) {
+    if (this.at(t, v)) { this.i++; return true; }
+    return false;
+  };
+  Parser.prototype.expect = function (t, v) {
+    if (!this.eat(t, v)) {
+      const x = this.peek();
+      throw PyErr('SyntaxError', "ожидалось '" + v + "', а найдено " +
+        (x ? "'" + (x.v !== undefined ? x.v : x.t) + "'" : 'конец строки'));
+    }
+  };
+
+  Parser.prototype.parseExpr = function () {
+    const e = this.parseOr();
+    if (this.at('kw', 'if')) {
+      this.next();
+      const cond = this.parseOr();
+      if (!this.eat('kw', 'else'))
+        throw PyErr('SyntaxError', "в выражении 'A if условие else B' пропущено else");
+      return { n: 'ternary', cond: cond, then: e, alt: this.parseExpr() };
+    }
+    return e;
+  };
+  Parser.prototype.parseOr = function () {
+    let l = this.parseAnd();
+    while (this.at('kw', 'or')) { this.next(); l = { n: 'or', l: l, r: this.parseAnd() }; }
+    return l;
+  };
+  Parser.prototype.parseAnd = function () {
+    let l = this.parseNot();
+    while (this.at('kw', 'and')) { this.next(); l = { n: 'and', l: l, r: this.parseNot() }; }
+    return l;
+  };
+  Parser.prototype.parseNot = function () {
+    if (this.at('kw', 'not')) { this.next(); return { n: 'not', e: this.parseNot() }; }
+    return this.parseCmp();
+  };
+  Parser.prototype.parseCmp = function () {
+    let left = this.parseAdd();
+    const ops = [], rights = [];
+    for (;;) {
+      let op = null;
+      const x = this.peek();
+      if (x && x.t === 'op' && ['==', '!=', '<', '>', '<=', '>='].includes(x.v)) { op = x.v; this.next(); }
+      else if (x && x.t === 'kw' && x.v === 'in') { op = 'in'; this.next(); }
+      else if (x && x.t === 'kw' && x.v === 'not' && this.peek(1) &&
+        this.peek(1).t === 'kw' && this.peek(1).v === 'in') { op = 'not in'; this.next(); this.next(); }
+      else if (x && x.t === 'kw' && x.v === 'is') {
+        this.next();
+        op = 'is';
+        if (this.at('kw', 'not')) { this.next(); op = 'is not'; }
+      }
+      else if (x && x.t === 'op' && x.v === '=') {
+        throw PyErr('SyntaxError', 'здесь нужно == (сравнение), а не = (присваивание)');
+      }
+      if (!op) break;
+      ops.push(op); rights.push(this.parseAdd());
+    }
+    if (!ops.length) return left;
+    return { n: 'cmp', first: left, ops: ops, rest: rights };
+  };
+  Parser.prototype.parseAdd = function () {
+    let l = this.parseMul();
+    while (this.at('op', '+') || this.at('op', '-')) {
+      const op = this.next().v;
+      l = { n: 'bin', op: op, l: l, r: this.parseMul() };
+    }
+    return l;
+  };
+  Parser.prototype.parseMul = function () {
+    let l = this.parseUnary();
+    while (this.at('op', '*') || this.at('op', '/') || this.at('op', '//') || this.at('op', '%')) {
+      const op = this.next().v;
+      l = { n: 'bin', op: op, l: l, r: this.parseUnary() };
+    }
+    return l;
+  };
+  Parser.prototype.parseUnary = function () {
+    if (this.at('op', '-')) { this.next(); return { n: 'neg', e: this.parseUnary() }; }
+    if (this.at('op', '+')) { this.next(); return this.parseUnary(); }
+    return this.parsePow();
+  };
+  Parser.prototype.parsePow = function () {
+    const base = this.parsePostfix();
+    if (this.at('op', '**')) { this.next(); return { n: 'bin', op: '**', l: base, r: this.parseUnary() }; }
+    return base;
+  };
+  Parser.prototype.parsePostfix = function () {
+    let e = this.parseAtom();
+    for (;;) {
+      if (this.at('op', '(')) {
+        this.next();
+        const args = [], kwargs = {};
+        if (!this.at('op', ')')) {
+          do {
+            if (this.at('name') && this.peek(1) && this.peek(1).t === 'op' && this.peek(1).v === '=') {
+              const key = this.next().v; this.next();
+              kwargs[key] = this.parseExpr();
+            } else if (this.at('op', '*')) {
+              this.next();
+              args.push({ n: 'star', e: this.parseExpr() });
+            } else args.push(this.parseExpr());
+          } while (this.eat('op', ','));
+        }
+        this.expect('op', ')');
+        e = { n: 'call', fn: e, args: args, kwargs: kwargs };
+      } else if (this.at('op', '[')) {
+        this.next();
+        let lo = null, hi = null, step = null, isSlice = false;
+        if (!this.at('op', ':')) lo = this.parseExpr();
+        if (this.at('op', ':')) {
+          isSlice = true; this.next();
+          if (!this.at('op', ':') && !this.at('op', ']')) hi = this.parseExpr();
+          if (this.at('op', ':')) { this.next(); if (!this.at('op', ']')) step = this.parseExpr(); }
+        }
+        this.expect('op', ']');
+        e = isSlice ? { n: 'slice', obj: e, lo: lo, hi: hi, step: step } : { n: 'index', obj: e, idx: lo };
+      } else if (this.at('op', '.')) {
+        this.next();
+        const nm = this.peek();
+        if (!nm || nm.t !== 'name') throw PyErr('SyntaxError', 'после точки нужно имя метода');
+        this.next();
+        e = { n: 'attr', obj: e, name: nm.v };
+      } else break;
+    }
+    return e;
+  };
+  Parser.prototype.parseAtom = function () {
+    const x = this.peek();
+    if (!x) throw PyErr('SyntaxError', 'выражение оборвалось');
+    if (x.t === 'num') { this.next(); return { n: 'num', v: x.v, isInt: x.isInt }; }
+    if (x.t === 'str') { this.next(); return { n: 'str', v: x.v }; }
+    if (x.t === 'fstr') {
+      this.next();
+      const parts = splitFString(x.raw, x.ln).map(p => {
+        if (p.lit !== undefined) return p;
+        const sub = new Parser(tokenize(p.src, p.ln));
+        const e = sub.parseExpr();
+        if (sub.i < sub.t.length) throw PyErr('SyntaxError', 'непонятное выражение в f-строке: {' + p.src + '}');
+        return { e: e, spec: p.spec };
+      });
+      return { n: 'fstr', parts: parts };
+    }
+    if (x.t === 'kw' && x.v === 'True') { this.next(); return { n: 'const', v: mkBool(true) }; }
+    if (x.t === 'kw' && x.v === 'False') { this.next(); return { n: 'const', v: mkBool(false) }; }
+    if (x.t === 'kw' && x.v === 'None') { this.next(); return { n: 'const', v: NONE }; }
+    if (x.t === 'name') { this.next(); return { n: 'name', v: x.v }; }
+    if (x.t === 'op' && x.v === '(') {
+      this.next();
+      const e = this.parseExpr();
+      this.expect('op', ')');
+      return e;
+    }
+    if (x.t === 'op' && x.v === '[') {
+      this.next();
+      const items = [];
+      if (!this.at('op', ']')) { do { items.push(this.parseExpr()); } while (this.eat('op', ',')); }
+      this.expect('op', ']');
+      return { n: 'list', items: items };
+    }
+    throw PyErr('SyntaxError', "неожиданно: '" + (x.v !== undefined ? x.v : x.t) + "'");
+  };
+
+  /* ---------------- разбор программы ---------------- */
+  function parseProgram(src) {
+    const raw = src.replace(/\t/g, '    ').split('\n');
+    const items = [];
+    raw.forEach((line, idx) => {
+      if (!line.trim() || /^\s*#/.test(line)) return;
+      const indent = line.length - line.replace(/^ +/, '').length;
+      const tokens = tokenize(line, idx + 1);
+      if (!tokens.length) return;
+      items.push({ indent: indent, text: line.trim(), ln: idx + 1, tokens: tokens });
+    });
+    const [body, pos] = parseSuite(items, 0, 0, 0);
+    if (pos < items.length) {
+      throw PyErr('IndentationError', 'строка ' + items[pos].ln + ': лишний отступ');
+    }
+    return body;
+  }
+
+  /* блок после двоеточия: либо в той же строке, либо вложенный с отступом */
+  function parseBlock(p, it, items, i, indent, loop, kw) {
+    if (p.i < p.t.length) return [[parseSimple(p, it, loop)], i + 1];
+    if (i + 1 >= items.length || items[i + 1].indent <= indent)
+      throw PyErr('IndentationError', 'строка ' + it.ln + ': после ' + kw + ' нужен блок с отступом (обычно 4 пробела)');
+    return parseSuite(items, i + 1, items[i + 1].indent, loop);
+  }
+
+  function parseSuite(items, i, indent, loop) {
+    const body = [];
+    while (i < items.length && items[i].indent === indent) {
+      const it = items[i];
+      const p = new Parser(it.tokens);
+      const first = p.peek();
+      if (first.t === 'kw' && ['def', 'import', 'class', 'try', 'return', 'lambda',
+        'from', 'with', 'global', 'del', 'except'].includes(first.v)) {
+        throw PyErr('SyntaxError', 'строка ' + it.ln + ": '" + first.v +
+          "' в этом тренажёре не поддерживается — доступны присваивание, print, if/elif/else, while и for");
+      }
+      if (first.t === 'kw' && first.v === 'if') {
+        p.next();
+        const cond = p.parseExpr();
+        p.expect('op', ':');
+        let r = parseBlock(p, it, items, i, indent, loop, 'if');
+        const node = { n: 'if', clauses: [{ cond: cond, body: r[0] }], orelse: null, ln: it.ln };
+        i = r[1];
+        while (i < items.length && items[i].indent === indent &&
+          items[i].tokens[0].t === 'kw' && ['elif', 'else'].includes(items[i].tokens[0].v)) {
+          const it2 = items[i];
+          const p2 = new Parser(it2.tokens);
+          const kw = p2.next().v;
+          let c2 = null;
+          if (kw === 'elif') c2 = p2.parseExpr();
+          else if (!p2.at('op', ':'))
+            throw PyErr('SyntaxError', 'строка ' + it2.ln + ': у else не бывает условия — ветка с условием называется elif');
+          p2.expect('op', ':');
+          const r2 = parseBlock(p2, it2, items, i, indent, loop, kw);
+          i = r2[1];
+          if (kw === 'elif') node.clauses.push({ cond: c2, body: r2[0] });
+          else { node.orelse = r2[0]; break; }
+        }
+        body.push(node);
+        continue;
+      }
+      if (first.t === 'kw' && first.v === 'while') {
+        p.next();
+        const cond = p.parseExpr();
+        p.expect('op', ':');
+        const r = parseBlock(p, it, items, i, indent, loop + 1, 'while');
+        body.push({ n: 'while', cond: cond, body: r[0], ln: it.ln });
+        i = r[1];
+        continue;
+      }
+      if (first.t === 'kw' && first.v === 'for') {
+        p.next();
+        const nm = p.peek();
+        if (!nm || nm.t !== 'name') throw PyErr('SyntaxError', 'строка ' + it.ln + ': после for нужно имя переменной');
+        p.next();
+        if (p.at('op', ','))
+          throw PyErr('SyntaxError', 'строка ' + it.ln + ': в этом тренажёре у for одна переменная цикла');
+        if (!p.eat('kw', 'in')) throw PyErr('SyntaxError', 'строка ' + it.ln + ": после переменной цикла нужно слово in");
+        const iter = p.parseExpr();
+        p.expect('op', ':');
+        const r = parseBlock(p, it, items, i, indent, loop + 1, 'for');
+        body.push({ n: 'for', target: nm.v, iter: iter, body: r[0], ln: it.ln });
+        i = r[1];
+        continue;
+      }
+      if (first.t === 'kw' && ['elif', 'else'].includes(first.v)) {
+        throw PyErr('SyntaxError', 'строка ' + it.ln + ": '" + first.v + "' без подходящего if выше (проверьте отступы)");
+      }
+      body.push(parseSimple(p, it, loop));
+      i++;
+    }
+    return [body, i];
+  }
+
+  function parseSimple(p, it, loop) {
+    if (p.at('kw', 'pass')) { p.next(); return { n: 'pass', ln: it.ln }; }
+    if (p.at('kw', 'break') || p.at('kw', 'continue')) {
+      const kw = p.next().v;
+      if (!loop) throw PyErr('SyntaxError', 'строка ' + it.ln + ": '" + kw + "' можно писать только внутри цикла");
+      if (p.i < p.t.length) throw PyErr('SyntaxError', 'строка ' + it.ln + ": после '" + kw + "' ничего не пишут");
+      return { n: kw, ln: it.ln };
+    }
+    // ищем присваивание на верхнем уровне
+    let depth = 0, eqAt = -1, aug = null;
+    for (let k = p.i; k < p.t.length; k++) {
+      const tk = p.t[k];
+      if (tk.t === 'op') {
+        if ('(['.includes(tk.v)) depth++;
+        else if (')]'.includes(tk.v)) depth--;
+        else if (depth === 0 && tk.v === '=') { eqAt = k; break; }
+        else if (depth === 0 && ['+=', '-=', '*=', '/='].includes(tk.v)) { eqAt = k; aug = tk.v[0]; break; }
+      }
+    }
+    if (eqAt >= 0) {
+      const tt = p.t.slice(p.i, eqAt);
+      if (!tt.length) throw PyErr('SyntaxError', 'строка ' + it.ln + ': слева от = ничего нет');
+      if (tt[0].t === 'kw')
+        throw PyErr('SyntaxError', 'строка ' + it.ln + ": '" + tt[0].v + "' — служебное слово, его нельзя использовать как имя переменной");
+      let target;
+      if (tt.length === 1 && tt[0].t === 'name') target = { n: 'name', v: tt[0].v };
+      else {
+        const tp = new Parser(tt);
+        let node = null;
+        try { node = tp.parseExpr(); } catch (e) { node = null; }
+        if (!node || tp.i < tp.t.length || node.n !== 'index')
+          throw PyErr('SyntaxError', 'строка ' + it.ln + ': слева от = должно быть имя переменной (или элемент списка вида a[i])');
+        target = node;
+      }
+      const sub = new Parser(p.t.slice(eqAt + 1));
+      if (!sub.t.length) throw PyErr('SyntaxError', 'строка ' + it.ln + ': справа от = ничего нет');
+      const val = sub.parseExpr();
+      if (sub.i < sub.t.length) throw PyErr('SyntaxError', 'строка ' + it.ln + ': лишнее после выражения');
+      return { n: 'assign', target: target, value: val, aug: aug, ln: it.ln };
+    }
+    const e = p.parseExpr();
+    if (p.i < p.t.length) {
+      const bad = p.peek();
+      throw PyErr('SyntaxError', 'строка ' + it.ln + ": лишнее в конце строки: '" + (bad.v !== undefined ? bad.v : bad.t) + "'");
+    }
+    return { n: 'expr', e: e, ln: it.ln };
+  }
+
+  /* ---------------- форматирование ---------------- */
+  function groupThousands(s) {
+    const neg = s.startsWith('-');
+    if (neg) s = s.slice(1);
+    const dot = s.indexOf('.');
+    let ip = dot < 0 ? s : s.slice(0, dot);
+    const fp = dot < 0 ? '' : s.slice(dot);
+    ip = ip.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return (neg ? '-' : '') + ip + fp;
+  }
+
+  /* округление half-even по точному значению double — как в Python */
+  function pyRound(x, nd) {
+    if (!isFinite(x)) return x;
+    if (nd === null || nd === undefined) {
+      const fl = Math.floor(x), diff = x - fl;
+      if (diff === 0.5) return (Math.abs(fl % 2) === 0) ? fl : fl + 1;
+      return Math.round(x) === -0 ? 0 : Math.round(x);
+    }
+    if (nd < 0) { const p = Math.pow(10, -nd); return pyRound(x / p, null) * p; }
+    const neg = x < 0, a = Math.abs(x);
+    if (a >= 1e17) return x;
+    const s = a.toFixed(Math.min(100, nd + 20));
+    const dot = s.indexOf('.');
+    const digits = s.slice(0, dot) + s.slice(dot + 1);
+    const cut = dot + nd;
+    const keep = digits.slice(0, cut), rest = digits.slice(cut);
+    let up = false;
+    if (rest) {
+      const f = rest[0];
+      if (f > '5') up = true;
+      else if (f === '5') {
+        if (/[1-9]/.test(rest.slice(1))) up = true;
+        else up = parseInt(keep[keep.length - 1] || '0', 10) % 2 === 1;
+      }
+    }
+    let num = keep === '' ? 0 : parseInt(keep, 10);
+    if (up) num += 1;
+    const res = num / Math.pow(10, nd);
+    return neg ? -res : res;
+  }
+
+  function applyFormat(val, spec) {
+    if (!spec) return pyStr(val);
+    const m = /^(?:(.)?([<>^]))?([+\- ])?(0)?(\d+)?(,)?(?:\.(\d+))?([sdfgeb%]?)$/.exec(spec);
+    if (!m) throw PyErr('ValueError', "непонятный формат '" + spec + "'");
+    let [, fill, align, sign, zero, width, comma, prec, type] = m;
+    let s;
+    if (type === 'f' || type === '%') {
+      if (!isNum(val)) throw PyErr('TypeError', 'формат :' + spec + ' работает только с числами');
+      let x = numVal(val);
+      if (type === '%') x *= 100;
+      s = x.toFixed(prec === undefined ? (type === '%' ? 6 : 6) : parseInt(prec, 10));
+      if (type === '%') s += '%';
+    } else if (type === 'd') {
+      if (!isNum(val)) throw PyErr('TypeError', 'формат :d работает только с целыми числами');
+      if (val.k === 'float') throw PyErr('ValueError', 'формат :d нельзя применять к float');
+      s = String(numVal(val));
+    } else if (prec !== undefined && isNum(val)) {
+      s = Number(numVal(val)).toPrecision(parseInt(prec, 10));
+      if (s.includes('.') && !s.includes('e')) s = s.replace(/\.?0+$/, '');
+    } else {
+      s = pyStr(val);
+      if (prec !== undefined) s = s.slice(0, parseInt(prec, 10));
+    }
+    if (comma) s = groupThousands(s);
+    if (sign === '+' && isNum(val) && !s.startsWith('-')) s = '+' + s;
+    if (width) {
+      const w = parseInt(width, 10);
+      const f = fill || (zero ? '0' : ' ');
+      const a = align || (zero ? '>' : (isNum(val) ? '>' : '<'));
+      while (s.length < w) {
+        if (a === '<') s = s + f;
+        else if (a === '>') s = (zero && /^[-+]/.test(s) ? s[0] + f + s.slice(1) : f + s);
+        else { s = s + f; if (s.length < w) s = f + s; }
+      }
+    }
+    return s;
+  }
+
+  /* ---------------- интерпретатор ---------------- */
+  function run(src, opts) {
+    opts = opts || {};
+    const out = [];
+    const stdin = (opts.stdin || []).slice();
+    const env = Object.create(null);
+    let steps = 0;
+
+    const write = s => {
+      out.push(s);
+      if (out.length > 5000) throw PyErr('RuntimeError', 'слишком много вывода');
+    };
+
+    const builtins = {
+      print: (args, kw) => {
+        const sep = kw.sep ? pyStr(kw.sep) : ' ';
+        const end = kw.end !== undefined ? pyStr(kw.end) : '\n';
+        write(args.map(pyStr).join(sep) + end);
+        return NONE;
+      },
+      input: (args) => {
+        if (args.length) write(pyStr(args[0]));
+        if (!stdin.length) throw PyErr('EOFError', 'input() вызван, а строк для ввода больше нет — ' +
+          'если это цикл, он не остановился на стоп-слове (проверьте условие и break)');
+        return mkStr(stdin.shift());
+      },
+      int: (args) => {
+        if (!args.length) return mkInt(0);
+        const a = args[0];
+        if (a.k === 'str') {
+          const t = a.v.trim();
+          if (!/^[+-]?\d+$/.test(t))
+            throw PyErr('ValueError', "int() не понимает строку '" + a.v + "' — там не целое число");
+          return mkInt(parseInt(t, 10));
+        }
+        if (isNum(a)) return mkInt(numVal(a) < 0 ? Math.ceil(numVal(a)) : Math.floor(numVal(a)));
+        throw PyErr('TypeError', 'int() не работает с ' + typeName(a));
+      },
+      float: (args) => {
+        if (!args.length) return mkFloat(0);
+        const a = args[0];
+        if (a.k === 'str') {
+          const t = a.v.trim();
+          if (!/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(t))
+            throw PyErr('ValueError', "float() не понимает строку '" + a.v + "'");
+          return mkFloat(parseFloat(t));
+        }
+        if (isNum(a)) return mkFloat(numVal(a));
+        throw PyErr('TypeError', 'float() не работает с ' + typeName(a));
+      },
+      str: (args) => mkStr(args.length ? pyStr(args[0]) : ''),
+      bool: (args) => mkBool(args.length ? truthy(args[0]) : false),
+      len: (args) => {
+        const a = args[0];
+        if (a.k === 'str') return mkInt(a.v.length);
+        if (a.k === 'list') return mkInt(a.v.length);
+        if (isNum(a)) throw PyErr('TypeError', 'len() не работает с числом ' + typeName(a) + ' — длину считают у строки или списка');
+        throw PyErr('TypeError', 'len() не работает с ' + typeName(a));
+      },
+      range: (args) => {
+        if (!args.length || args.length > 3) throw PyErr('TypeError', 'range() принимает от 1 до 3 аргументов');
+        args.forEach(a => { if (!isIntLike(a)) throw PyErr('TypeError', 'range() принимает только целые числа, а не ' + typeName(a)); });
+        let st = 0, en, sp = 1;
+        if (args.length === 1) en = numVal(args[0]);
+        else { st = numVal(args[0]); en = numVal(args[1]); if (args.length === 3) sp = numVal(args[2]); }
+        if (sp === 0) throw PyErr('ValueError', 'шаг range() не может быть 0');
+        const v = [];
+        for (let i = st; sp > 0 ? i < en : i > en; i += sp) { v.push(mkInt(i)); if (v.length > 100000) throw PyErr('RuntimeError', 'range() слишком большой'); }
+        const r = mkList(v); r.rng = [st, en, sp]; return r;
+      },
+      list: (args) => {
+        if (!args.length) return mkList([]);
+        return mkList(iterOf(args[0]).slice());
+      },
+      sorted: (args) => {
+        const items = iterOf(args[0]).slice();
+        items.sort(compare);
+        return mkList(items);
+      },
+      reversed: (args) => mkList(iterOf(args[0]).slice().reverse()),
+      type: (args) => ({ k: 'type', name: typeName(args[0]) }),
+      round: (args) => {
+        const a = args[0];
+        if (!isNum(a)) throw PyErr('TypeError', 'round() работает только с числами');
+        const nd = args.length > 1 ? numVal(args[1]) : null;
+        const r = pyRound(numVal(a), nd);
+        if (nd === null) return mkInt(r);
+        return a.k === 'float' ? mkFloat(r) : mkInt(r);
+      },
+      abs: (args) => {
+        const a = args[0];
+        if (!isNum(a)) throw PyErr('TypeError', 'abs() работает только с числами');
+        return a.k === 'float' ? mkFloat(Math.abs(a.v)) : mkInt(Math.abs(numVal(a)));
+      },
+      min: (args) => pickExtreme(args, -1),
+      max: (args) => pickExtreme(args, 1),
+      sum: (args) => {
+        const a = args[0];
+        if (a.k !== 'list') throw PyErr('TypeError', 'sum() ждёт список');
+        let acc = 0, isF = false;
+        a.v.forEach(x => { if (!isNum(x)) throw PyErr('TypeError', 'sum(): в списке не число'); acc += numVal(x); if (x.k === 'float') isF = true; });
+        return isF ? mkFloat(acc) : mkInt(acc);
+      }
+    };
+
+    function pickExtreme(args, dir) {
+      let list = args;
+      if (args.length === 1 && args[0].k === 'list') list = args[0].v;
+      if (!list.length) throw PyErr('ValueError', 'min()/max(): пустая последовательность');
+      let best = list[0];
+      for (const x of list.slice(1)) {
+        const c = compare(x, best);
+        if (dir > 0 ? c > 0 : c < 0) best = x;
+      }
+      return best;
+    }
+
+    function compare(a, b) {
+      if (isNum(a) && isNum(b)) return numVal(a) - numVal(b);
+      if (a.k === 'str' && b.k === 'str') return a.v < b.v ? -1 : (a.v > b.v ? 1 : 0);
+      throw PyErr('TypeError', "нельзя сравнивать '<' у " + typeName(a) + ' и ' + typeName(b));
+    }
+
+    function eq(a, b) {
+      if (isNum(a) && isNum(b)) return numVal(a) === numVal(b);
+      if (a.k === 'str' && b.k === 'str') return a.v === b.v;
+      if (a.k === 'none' && b.k === 'none') return true;
+      if (a.k === 'list' && b.k === 'list')
+        return a.v.length === b.v.length && a.v.every((x, i) => eq(x, b.v[i]));
+      return false;
+    }
+
+    function binop(op, a, b) {
+      if (op === '+') {
+        if (a.k === 'str' && b.k === 'str') return mkStr(a.v + b.v);
+        if (a.k === 'list' && b.k === 'list') return mkList(a.v.concat(b.v));
+        if (isNum(a) && isNum(b))
+          return (a.k === 'float' || b.k === 'float') ? mkFloat(numVal(a) + numVal(b)) : mkInt(numVal(a) + numVal(b));
+        if (a.k === 'str' || b.k === 'str')
+          throw PyErr('TypeError', 'нельзя складывать ' + typeName(a) + ' и ' + typeName(b) +
+            ' — переведите число в строку через str() или используйте f-строку');
+        throw PyErr('TypeError', 'нельзя складывать ' + typeName(a) + ' и ' + typeName(b));
+      }
+      if (op === '*') {
+        if (a.k === 'str' && isIntLike(b)) return mkStr(a.v.repeat(Math.max(0, numVal(b))));
+        if (isIntLike(a) && b.k === 'str') return mkStr(b.v.repeat(Math.max(0, numVal(a))));
+        if (isNum(a) && isNum(b))
+          return (a.k === 'float' || b.k === 'float') ? mkFloat(numVal(a) * numVal(b)) : mkInt(numVal(a) * numVal(b));
+        throw PyErr('TypeError', 'нельзя умножать ' + typeName(a) + ' и ' + typeName(b));
+      }
+      if (!isNum(a) || !isNum(b))
+        throw PyErr('TypeError', "операция '" + op + "' не работает с " + typeName(a) + ' и ' + typeName(b));
+      const x = numVal(a), y = numVal(b);
+      const bothInt = !(a.k === 'float' || b.k === 'float');
+      switch (op) {
+        case '-': return bothInt ? mkInt(x - y) : mkFloat(x - y);
+        case '/':
+          if (y === 0) throw PyErr('ZeroDivisionError', 'деление на ноль');
+          return mkFloat(x / y);
+        case '//':
+          if (y === 0) throw PyErr('ZeroDivisionError', 'целочисленное деление на ноль');
+          return bothInt ? mkInt(Math.floor(x / y)) : mkFloat(Math.floor(x / y));
+        case '%':
+          if (y === 0) throw PyErr('ZeroDivisionError', 'остаток от деления на ноль');
+          {
+            const r = x - Math.floor(x / y) * y;
+            return bothInt ? mkInt(r) : mkFloat(r);
+          }
+        case '**': {
+          const r = Math.pow(x, y);
+          return (bothInt && y >= 0) ? mkInt(r) : mkFloat(r);
+        }
+      }
+      throw PyErr('SyntaxError', 'неизвестная операция ' + op);
+    }
+
+    function iterOf(x) {
+      if (x.k === 'list') return x.v;
+      if (x.k === 'str') return x.v.split('').map(mkStr);
+      throw PyErr('TypeError', typeName(x) + ' нельзя перебирать в цикле — нужна строка, список или range()');
+    }
+
+    function sliceIndices(len, lo, hi, step) {
+      if (step === 0) throw PyErr('ValueError', 'шаг среза не может быть 0');
+      let start, stop;
+      if (step > 0) {
+        start = lo === null ? 0 : (lo < 0 ? Math.max(len + lo, 0) : Math.min(lo, len));
+        stop = hi === null ? len : (hi < 0 ? Math.max(len + hi, 0) : Math.min(hi, len));
+      } else {
+        start = lo === null ? len - 1 : (lo < 0 ? Math.max(len + lo, -1) : Math.min(lo, len - 1));
+        stop = hi === null ? -1 : (hi < 0 ? Math.max(len + hi, -1) : Math.min(hi, len - 1));
+      }
+      const idx = [];
+      for (let i = start; step > 0 ? i < stop : i > stop; i += step) idx.push(i);
+      return idx;
+    }
+
+    function contains(item, box) {
+      if (box.k === 'str') {
+        if (item.k !== 'str') throw PyErr('TypeError', "'in' со строкой требует строку слева, а не " + typeName(item));
+        return box.v.includes(item.v);
+      }
+      if (box.k === 'list') return box.v.some(x => eq(x, item));
+      throw PyErr('TypeError', "'in' не работает с " + typeName(box));
+    }
+
+    const strMethods = {
+      upper: (s) => mkStr(s.toUpperCase()),
+      lower: (s) => mkStr(s.toLowerCase()),
+      strip: (s, a) => mkStr(a && a.length ? s.replace(new RegExp('^[' + esc(a[0].v) + ']+|[' + esc(a[0].v) + ']+$', 'g'), '') : s.trim()),
+      title: (s) => mkStr(s.replace(/[A-Za-zА-Яа-яЁё]+/g, w => w[0].toUpperCase() + w.slice(1).toLowerCase())),
+      capitalize: (s) => mkStr(s ? s[0].toUpperCase() + s.slice(1).toLowerCase() : s),
+      replace: (s, a) => mkStr(s.split(pyStr(a[0])).join(pyStr(a[1]))),
+      split: (s, a) => mkList((a && a.length ? s.split(pyStr(a[0])) : s.trim().split(/\s+/).filter(x => x)).map(mkStr)),
+      isdigit: (s) => mkBool(s.length > 0 && /^[0-9]+$/.test(s)),
+      isalpha: (s) => mkBool(s.length > 0 && /^[A-Za-zА-Яа-яЁё]+$/.test(s)),
+      startswith: (s, a) => mkBool(s.startsWith(pyStr(a[0]))),
+      endswith: (s, a) => mkBool(s.endsWith(pyStr(a[0]))),
+      count: (s, a) => {
+        if (!a || !a.length) throw PyErr('TypeError', 'count() ждёт подстроку, которую нужно посчитать');
+        if (a[0].k !== 'str') throw PyErr('TypeError', 'count() считает подстроку, а получил ' + typeName(a[0]));
+        return mkInt(a[0].v === '' ? s.length + 1 : s.split(a[0].v).length - 1);
+      },
+      find: (s, a) => mkInt(s.indexOf(pyStr(a[0]))),
+      rfind: (s, a) => mkInt(s.lastIndexOf(pyStr(a[0]))),
+      index: (s, a) => {
+        const i = s.indexOf(pyStr(a[0]));
+        if (i < 0) throw PyErr('ValueError', 'подстрока не найдена (find() вернул бы -1)');
+        return mkInt(i);
+      },
+      swapcase: (s) => mkStr(s.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join('')),
+      isupper: (s) => { const l = s.replace(/[^A-Za-zА-Яа-яЁё]/g, ''); return mkBool(l.length > 0 && l === l.toUpperCase()); },
+      islower: (s) => { const l = s.replace(/[^A-Za-zА-Яа-яЁё]/g, ''); return mkBool(l.length > 0 && l === l.toLowerCase()); },
+      isalnum: (s) => mkBool(s.length > 0 && /^[A-Za-zА-Яа-яЁё0-9]+$/.test(s)),
+      isspace: (s) => mkBool(s.length > 0 && /^\s+$/.test(s)),
+      istitle: (s) => mkBool(/[A-Za-zА-Яа-яЁё]/.test(s) && s === s.replace(/[A-Za-zА-Яа-яЁё]+/g, w => w[0].toUpperCase() + w.slice(1).toLowerCase())),
+      join: (s, a) => {
+        if (!a || !a.length) throw PyErr('TypeError', 'join() ждёт список строк в скобках');
+        const items = iterOf(a[0]);
+        items.forEach((x, i) => {
+          if (x.k !== 'str') throw PyErr('TypeError', 'join() склеивает только строки, а элемент ' + i +
+            ' списка — ' + typeName(x) + ' (переведите его через str())');
+        });
+        return mkStr(items.map(x => x.v).join(s));
+      },
+      zfill: (s, a) => { const w = numVal(a[0]); const neg = s.startsWith('-'); const body = neg ? s.slice(1) : s; return mkStr((neg ? '-' : '') + body.padStart(w - (neg ? 1 : 0), '0')); },
+      center: (s, a) => { const w = numVal(a[0]), f = a[1] ? a[1].v : ' '; let r = s; let left = true; while (r.length < w) { r = left ? r + f : f + r; left = !left; } return mkStr(r); },
+      ljust: (s, a) => mkStr(s.padEnd(numVal(a[0]), a[1] ? a[1].v : ' ')),
+      rjust: (s, a) => mkStr(s.padStart(numVal(a[0]), a[1] ? a[1].v : ' '))
+    };
+    // методы, которых у строк нет, но их часто зовут по ошибке
+    const strMethodHints = {
+      append: 'строки неизменяемы, append есть только у списков — используйте s = s + "..."',
+      add: 'у строк нет add — для склейки используйте + или f-строку',
+      length: 'длина считается функцией len(s), а не методом',
+      len: 'длина считается функцией len(s), а не методом',
+      reverse: 'у строк нет reverse — перевернуть строку можно срезом s[::-1]',
+      sort: 'у строк нет sort — можно sorted(s), это даст список символов',
+      contains: 'проверка вхождения пишется оператором: подстрока in s',
+      isnumber: 'такого метода нет — проверка цифр называется isdigit()',
+      isnumeric: 'в тренажёре используйте isdigit()',
+      isletter: 'такого метода нет — проверка букв называется isalpha()',
+      touppercase: 'в Python метод называется upper()',
+      tolowercase: 'в Python метод называется lower()',
+      capitalise: 'метод пишется через z: capitalize()'
+    };
+
+    const listMethods = {
+      append: (l, a) => { if (a.length !== 1) throw PyErr('TypeError', 'append() добавляет ровно один элемент'); l.v.push(a[0]); return NONE; },
+      extend: (l, a) => { l.v.push(...iterOf(a[0])); return NONE; },
+      insert: (l, a) => { let i = numVal(a[0]); if (i < 0) i = Math.max(0, l.v.length + i); l.v.splice(Math.min(i, l.v.length), 0, a[1]); return NONE; },
+      pop: (l, a) => {
+        if (!l.v.length) throw PyErr('IndexError', 'pop() из пустого списка');
+        let i = a.length ? numVal(a[0]) : l.v.length - 1;
+        if (i < 0) i += l.v.length;
+        if (i < 0 || i >= l.v.length) throw PyErr('IndexError', 'pop(): индекс вне диапазона');
+        return l.v.splice(i, 1)[0];
+      },
+      remove: (l, a) => { const i = l.v.findIndex(x => eq(x, a[0])); if (i < 0) throw PyErr('ValueError', 'remove(): такого элемента нет в списке'); l.v.splice(i, 1); return NONE; },
+      count: (l, a) => mkInt(l.v.filter(x => eq(x, a[0])).length),
+      index: (l, a) => { const i = l.v.findIndex(x => eq(x, a[0])); if (i < 0) throw PyErr('ValueError', 'index(): такого элемента нет в списке'); return mkInt(i); },
+      reverse: (l) => { l.v.reverse(); return NONE; },
+      sort: (l) => { l.v.sort(compare); return NONE; },
+      clear: (l) => { l.v.length = 0; return NONE; },
+      copy: (l) => mkList(l.v.slice())
+    };
+    const listMethodHints = {
+      join: 'join вызывается у строки-разделителя, а список идёт в скобки: ", ".join(список)',
+      add: 'у списков добавление называется append()',
+      push: 'у списков добавление называется append()',
+      length: 'длина считается функцией len(список)',
+      len: 'длина считается функцией len(список)',
+      upper: 'upper() есть у строк, а не у списков — примените к элементу или к результату join()',
+      lower: 'lower() есть у строк, а не у списков',
+      split: 'split() есть у строк — список уже разбит',
+      isdigit: 'isdigit() есть у строк — проверяйте отдельный элемент списка'
+    };
+    const esc = s => s.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
+
+    function evalNode(node) {
+      if (steps++ > 200000) throw PyErr('RuntimeError', 'программа слишком долгая');
+      switch (node.n) {
+        case 'num': return node.isInt ? mkInt(node.v) : mkFloat(node.v);
+        case 'str': return mkStr(node.v);
+        case 'const': return node.v;
+        case 'list': return mkList(node.items.map(evalNode));
+        case 'name': {
+          if (node.v in env) return env[node.v];
+          if (node.v in builtins) return { k: 'builtin', name: node.v };
+          throw PyErr('NameError', "имя '" + node.v + "' не определено — переменная не создана или в имени опечатка");
+        }
+        case 'fstr': {
+          let s = '';
+          for (const p of node.parts) {
+            if (p.lit !== undefined) { s += p.lit; continue; }
+            s += applyFormat(evalNode(p.e), p.spec);
+          }
+          return mkStr(s);
+        }
+        case 'neg': {
+          const v = evalNode(node.e);
+          if (!isNum(v)) throw PyErr('TypeError', 'минус не работает с ' + typeName(v));
+          return v.k === 'float' ? mkFloat(-v.v) : mkInt(-numVal(v));
+        }
+        case 'not': return mkBool(!truthy(evalNode(node.e)));
+        case 'ternary': return truthy(evalNode(node.cond)) ? evalNode(node.then) : evalNode(node.alt);
+        case 'and': { const l = evalNode(node.l); return truthy(l) ? evalNode(node.r) : l; }
+        case 'or': { const l = evalNode(node.l); return truthy(l) ? l : evalNode(node.r); }
+        case 'bin': return binop(node.op, evalNode(node.l), evalNode(node.r));
+        case 'cmp': {
+          let left = evalNode(node.first);
+          for (let i = 0; i < node.ops.length; i++) {
+            const right = evalNode(node.rest[i]);
+            const op = node.ops[i];
+            let res;
+            if (op === '==') res = eq(left, right);
+            else if (op === '!=') res = !eq(left, right);
+            else if (op === 'in') res = contains(left, right);
+            else if (op === 'not in') res = !contains(left, right);
+            else if (op === 'is') res = (left === right) || eq(left, right) && (left.k === right.k);
+            else if (op === 'is not') res = !((left === right) || eq(left, right) && (left.k === right.k));
+            else {
+              const c = compare(left, right);
+              res = op === '<' ? c < 0 : op === '>' ? c > 0 : op === '<=' ? c <= 0 : c >= 0;
+            }
+            if (!res) return mkBool(false);
+            left = right;
+          }
+          return mkBool(true);
+        }
+        case 'index': {
+          const o = evalNode(node.obj), idx = evalNode(node.idx);
+          const len = o.k === 'str' ? o.v.length : (o.k === 'list' ? o.v.length : null);
+          if (len === null) throw PyErr('TypeError', typeName(o) + ' нельзя индексировать — квадратные скобки работают со строками и списками');
+          if (!isIntLike(idx)) throw PyErr('TypeError', 'индексом может быть только целое число, а не ' + typeName(idx) +
+            (idx.k === 'float' ? ' (даже 2.0 не подходит)' : ''));
+          let i = numVal(idx);
+          const orig = i;
+          if (i < 0) i += len;
+          if (i < 0 || i >= len) {
+            const what = o.k === 'str' ? 'в строке' : 'в списке';
+            const unit = o.k === 'str' ? ' символов' : ' элементов';
+            throw PyErr('IndexError', 'индекс ' + orig + ' вне диапазона — ' + what + ' всего ' + len +
+              (len === 0 ? unit + ' (' + (o.k === 'str' ? 'строка пустая' : 'список пустой') + ')' : unit + ' (индексы от 0 до ' + (len - 1) + ' или от -1 до -' + len + ')'));
+          }
+          return o.k === 'str' ? mkStr(o.v[i]) : o.v[i];
+        }
+        case 'slice': {
+          const o = evalNode(node.obj);
+          if (o.k !== 'str' && o.k !== 'list') throw PyErr('TypeError', typeName(o) + ' нельзя взять срезом');
+          const part = x => { if (x === null) return null; const v = evalNode(x); if (!isIntLike(v)) throw PyErr('TypeError', 'границы среза должны быть целыми числами, а не ' + typeName(v)); return numVal(v); };
+          const lo = part(node.lo), hi = part(node.hi), st = node.step === null ? 1 : part(node.step);
+          const idx = sliceIndices(o.k === 'str' ? o.v.length : o.v.length, lo, hi, st);
+          return o.k === 'str' ? mkStr(idx.map(i => o.v[i]).join('')) : mkList(idx.map(i => o.v[i]));
+        }
+        case 'attr': {
+          const o = evalNode(node.obj);
+          if (o.k === 'str') {
+            if (strMethods[node.name]) return { k: 'method', self: o, name: node.name };
+            const hint = strMethodHints[node.name.toLowerCase()];
+            throw PyErr('AttributeError', "у str нет метода '" + node.name + "'" + (hint ? ' — ' + hint : ''));
+          }
+          if (o.k === 'list') {
+            if (listMethods[node.name]) return { k: 'method', self: o, name: node.name };
+            const hint = listMethodHints[node.name.toLowerCase()];
+            throw PyErr('AttributeError', "у list нет метода '" + node.name + "'" + (hint ? ' — ' + hint : ''));
+          }
+          if (isNum(o)) throw PyErr('AttributeError', "у числа (" + typeName(o) + ") нет метода '" + node.name + "' — методы строк работают только со строками, переведите через str()");
+          throw PyErr('AttributeError', "у " + typeName(o) + " нет метода '" + node.name + "'");
+        }
+        case 'call': {
+          const fn = evalNode(node.fn);
+          const args = [];
+          node.args.forEach(a => {
+            if (a.n === 'star') args.push(...iterOf(evalNode(a.e)));
+            else args.push(evalNode(a));
+          });
+          const kw = {};
+          for (const k in node.kwargs) kw[k] = evalNode(node.kwargs[k]);
+          if (fn.k === 'builtin') {
+            if (fn.name !== 'print' && Object.keys(kw).length && fn.name !== 'round')
+              throw PyErr('TypeError', fn.name + '() не принимает такие аргументы');
+            if (fn.name !== 'print' && fn.name !== 'input' && fn.name !== 'list' && fn.name !== 'int' &&
+              fn.name !== 'float' && fn.name !== 'str' && fn.name !== 'bool' && args.length === 0)
+              throw PyErr('TypeError', fn.name + '() вызван без аргумента');
+            return builtins[fn.name](args, kw);
+          }
+          if (fn.k === 'method') {
+            if (fn.self.k === 'str') return strMethods[fn.name](fn.self.v, args);
+            return listMethods[fn.name](fn.self, args);
+          }
+          if (fn.k === 'str') throw PyErr('TypeError', "строку нельзя вызвать как функцию — возможно, пропущен оператор или лишние скобки");
+          throw PyErr('TypeError', typeName(fn) + ' нельзя вызвать как функцию' + (fn.k === 'list' ? ' — элемент списка берут квадратными скобками: a[i]' : ''));
+        }
+      }
+      throw PyErr('SyntaxError', 'неизвестный узел ' + node.n);
+    }
+
+    function assignTo(target, v) {
+      if (target.n === 'name') { env[target.v] = v; return; }
+      const o = evalNode(target.obj), idx = evalNode(target.idx);
+      if (o.k === 'str') throw PyErr('TypeError', 'строку нельзя изменить по индексу — строки неизменяемы; ' +
+        'соберите новую: s = s[:i] + "x" + s[i+1:]');
+      if (o.k !== 'list') throw PyErr('TypeError', typeName(o) + ' не поддерживает присваивание по индексу');
+      if (!isIntLike(idx)) throw PyErr('TypeError', 'индексом может быть только целое число');
+      let i = numVal(idx);
+      if (i < 0) i += o.v.length;
+      if (i < 0 || i >= o.v.length) throw PyErr('IndexError', 'присваивание по индексу вне диапазона — список не растягивается, используйте append()');
+      o.v[i] = v;
+    }
+
+    function readTarget(target) {
+      if (target.n === 'name') {
+        if (!(target.v in env)) throw PyErr('NameError', "имя '" + target.v + "' не определено — нельзя увеличить переменную, которой ещё нет");
+        return env[target.v];
+      }
+      return evalNode(target);
+    }
+
+    function execBody(body) {
+      for (const st of body) {
+        if (steps++ > 300000) throw PyErr('RuntimeError', 'программа выполняется слишком долго — похоже, цикл бесконечный (не сработал break или условие выхода)');
+        switch (st.n) {
+          case 'assign': {
+            let v = evalNode(st.value);
+            if (st.aug) v = binop(st.aug, readTarget(st.target), v);
+            assignTo(st.target, v);
+            break;
+          }
+          case 'expr': evalNode(st.e); break;
+          case 'if': {
+            let done = false;
+            for (const cl of st.clauses) {
+              if (truthy(evalNode(cl.cond))) { const sig = execBody(cl.body); if (sig) return sig; done = true; break; }
+            }
+            if (!done && st.orelse) { const sig = execBody(st.orelse); if (sig) return sig; }
+            break;
+          }
+          case 'while': {
+            while (truthy(evalNode(st.cond))) {
+              if (steps++ > 300000) throw PyErr('RuntimeError', 'цикл while не заканчивается — бесконечный цикл (нет break или условие всегда истинно)');
+              const sig = execBody(st.body);
+              if (sig === 'break') break;
+            }
+            break;
+          }
+          case 'for': {
+            const items = iterOf(evalNode(st.iter)).slice();
+            for (const v of items) {
+              env[st.target] = v;
+              const sig = execBody(st.body);
+              if (sig === 'break') break;
+            }
+            break;
+          }
+          case 'break': return 'break';
+          case 'continue': return 'continue';
+          case 'pass': break;
+        }
+      }
+      return null;
+    }
+
+    try {
+      const prog = parseProgram(src);
+      execBody(prog);
+      return { output: out.join(''), error: null, env: env };
+    } catch (e) {
+      if (e && e.isPy) return { output: out.join(''), error: e.pyName + ': ' + e.message, env: env };
+      return { output: out.join(''), error: 'Ошибка: ' + (e && e.message ? e.message : String(e)), env: env };
+    }
+  }
+
+  global.pyRun = run;
+  if (typeof module !== 'undefined' && module.exports) module.exports = { run: run };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+const DATA = {"chapters":[{"n":1,"title":"Индексы","lead":"нумерация с нуля, отрицательные индексы, IndexError"},{"n":2,"title":"Срезы","lead":"s[a:b], шаг, разворот и почему срез не падает"},{"n":3,"title":"Проверки строк","lead":"isdigit, isalpha, isalnum, count, startswith, endswith"},{"n":4,"title":"Регистр","lead":"upper, lower, capitalize, title, swapcase"},{"n":5,"title":"f-строки","lead":"выражения и методы внутри скобок, форматы"},{"n":6,"title":"split и join","lead":"из строки в список и обратно"},{"n":7,"title":"Цикл while True","lead":"ввод до стоп-слова, break, накопление"},{"n":8,"title":"Логические выражения","lead":"выбери все верные — как в демоверсии"},{"n":9,"title":"Найди ошибки","lead":"нумерованный код — как в демоверсии"},{"n":10,"title":"Всё вместе","lead":"задачи на все темы сразу"}],"tasks":[{"ch":1,"type":"predict","q":"Что напечатает программа? Помни: нумерация начинается с нуля.","code":"s = \"программа\"\nprint(s[0], s[4], s[-1])\nprint(s[len(s) - 1])\nprint(s[-9])","explain":"Символы нумеруются с 0, поэтому s[4] — пятый символ, «р». s[-1] и s[len(s) - 1] — один и тот же последний символ. s[-9] в строке из 9 символов — это самый первый.","id":"t1","answer":"п р а\nа\nп"},{"ch":1,"type":"mcq","q":"Что произойдёт при выполнении?\u003cpre>\u003ccode>s = \"python\"\nprint(s[6])\u003c/code>\u003c/pre>","options":["напечатает n","напечатает пустую строку","ошибка IndexError","напечатает None"],"correct":2,"explain":"В строке из 6 символов индексы идут от 0 до 5. Индекс 6 — уже за границей, и это ошибка, а не пустая строка. Последний символ — s[5] или s[-1].","id":"t2"},{"ch":1,"type":"mcq","q":"Строка \u003ccode>s\u003c/code> состоит из 12 символов. Какой индекс у её последнего символа?","options":["12","11","-12","len(s)"],"correct":1,"explain":"Индексы от 0 до 11: последний равен len(s) - 1. Вариант len(s) даёт 12 и вызывает IndexError, а -12 — это первый символ, если считать с конца.","id":"t3"},{"ch":1,"type":"predict","q":"Что напечатает программа? Обрати внимание на двойные индексы.","code":"words = [\"кот\", \"собака\", \"рыба\"]\nprint(words[1])\nprint(words[1][0])\nprint(words[-1][-1])\nprint(len(words), len(words[1]))","explain":"words[1] — элемент списка, строка «собака». К ней снова можно применить индекс: words[1][0] — её первая буква. len(words) считает элементы списка, а len(words[1]) — буквы в слове.","id":"t4","answer":"собака\nс\nа\n3 6"},{"ch":1,"type":"code","mode":"write","q":"Переменная \u003ccode>s\u003c/code> хранит слово. Выведи строку вида \u003ccode>Первая: п, последняя: н, в середине: т\u003c/code>. Средний символ — с индексом \u003ccode>len(s) // 2\u003c/code>.","starter":"","sol":"print(f\"Первая: {s[0]}, последняя: {s[-1]}, в середине: {s[len(s) // 2]}\")","tests":[{"prelude":"s = \"питон\"","expect":"Первая: п, последняя: н, в середине: т"},{"prelude":"s = \"программирование\"","expect":"Первая: п, последняя: е, в середине: и"},{"prelude":"s = \"я\"","expect":"Первая: я, последняя: я, в середине: я"}],"require":[{"re":"\\[","msg":"Символы достают индексами в квадратных скобках."}],"hint":"Три индекса: 0, -1 и len(s) // 2. Для «я» все три — один символ.","id":"t5","forbid":[{"re":"(^|\\n)\\s*s\\s*=[^=]","msg":"Переменную s задаёт проверяющий — её не нужно создавать заново."}]},{"ch":1,"type":"code","mode":"fix","q":"Программа должна печатать последний символ слова, а падает с IndexError. Почини.","starter":"print(s[len(s)])","sol":"print(s[-1])","tests":[{"prelude":"s = \"экзамен\"","expect":"н"},{"prelude":"s = \"код\"","expect":"д"},{"prelude":"s = \"а\"","expect":"а"}],"hint":"len(s) — это количество символов, а последний индекс на единицу меньше.","id":"t6","forbid":[{"re":"(^|\\n)\\s*s\\s*=[^=]","msg":"Переменную s задаёт проверяющий — её не нужно создавать заново."}]},{"ch":1,"type":"code","mode":"fix","q":"Хотели заменить первую букву слова на «р» и получить \u003ccode>рот\u003c/code> из \u003ccode>кот\u003c/code>. Программа падает с TypeError. Почини, собрав новую строку.","starter":"s[0] = \"р\"\nprint(s)","sol":"s = \"р\" + s[1:]\nprint(s)","tests":[{"prelude":"s = \"кот\"","expect":"рот"},{"prelude":"s = \"мак\"","expect":"рак"},{"prelude":"s = \"нос\"","expect":"рос"}],"require":[{"re":"\\[1:","msg":"Хвост слова без первой буквы — это срез s[1:]."}],"hint":"Строки неизменяемы: символ нельзя перезаписать, но можно склеить новую строку из «р» и среза s[1:].","id":"t7","forbid":[]},{"ch":2,"type":"predict","q":"Что напечатает программа?","code":"s = \"информатика\"\nprint(s[0:3])\nprint(s[3:])\nprint(s[:4])\nprint(s[-4:])\nprint(s[::2])\nprint(s[::-1])","explain":"Срез s[a:b] берёт символы с индекса a до b, не включая b. Пропущенная граница означает «с начала» или «до конца». s[::2] — каждый второй символ, s[::-1] — строка задом наперёд.","id":"t8","answer":"инф\nорматика\nинфо\nтика\nифраиа\nакитамрофни"},{"ch":2,"type":"mcq","q":"Чему равно \u003ccode>\"abcdef\"[2:4]\u003c/code>?","options":["\"cde\"","\"cd\"","\"bc\"","\"bcd\""],"correct":1,"explain":"Индексы 2 и 3 — это «c» и «d». Правая граница 4 в срез не входит. Длина среза — это разность границ: 4 - 2 = 2 символа.","id":"t9"},{"ch":2,"type":"mcq","q":"Что даст \u003ccode>\"abc\"[5:10]\u003c/code>?","options":["ошибку IndexError","пустую строку","\"abc\"","None"],"correct":1,"explain":"В отличие от индекса, срез никогда не падает: границы за пределами строки просто обрезаются. Здесь обе границы больше длины, поэтому получается пустая строка.","id":"t10"},{"ch":2,"type":"predict","q":"Что напечатает программа? Если какая-то строка вывода пустая, оставь в ответе пустую строку.","code":"s = \"0123456789\"\nprint(s[2:8:2])\nprint(s[3:3])\nprint(s[8:2:-1])\nprint(s[-3:])\nprint(s[:-3])","explain":"Шаг 2 берёт индексы 2, 4, 6. s[3:3] — границы совпали, срез пустой. Отрицательный шаг идёт справа налево: от 8 вниз до 3 включительно. s[:-3] — всё, кроме трёх последних.","id":"t11","answer":"246\n\n876543\n789\n0123456"},{"ch":2,"type":"code","mode":"write","q":"Переменная \u003ccode>s\u003c/code> хранит слово. Выведи его задом наперёд одним срезом.","starter":"","sol":"print(s[::-1])","tests":[{"prelude":"s = \"питон\"","expect":"нотип"},{"prelude":"s = \"шалаш\"","expect":"шалаш"},{"prelude":"s = \"а\"","expect":"а"}],"require":[{"re":"\\[::-1\\]","msg":"Разворот строки — это срез с шагом -1: s[::-1]."}],"hint":"Обе границы пропущены, шаг равен -1.","id":"t12","forbid":[{"re":"(^|\\n)\\s*s\\s*=[^=]","msg":"Переменную s задаёт проверяющий — её не нужно создавать заново."}]},{"ch":2,"type":"code","mode":"write","q":"Выведи строку вида \u003ccode>Начало: про, конец: мма\u003c/code> — первые три и последние три символа слова из переменной \u003ccode>s\u003c/code>.","starter":"","sol":"print(f\"Начало: {s[:3]}, конец: {s[-3:]}\")","tests":[{"prelude":"s = \"программа\"","expect":"Начало: про, конец: мма"},{"prelude":"s = \"питон\"","expect":"Начало: пит, конец: тон"},{"prelude":"s = \"код\"","expect":"Начало: код, конец: код"}],"require":[{"re":"\\[-3:\\]","msg":"Последние три символа — это срез s[-3:]."}],"hint":"Первые три — s[:3], последние три — s[-3:].","id":"t13","forbid":[{"re":"(^|\\n)\\s*s\\s*=[^=]","msg":"Переменную s задаёт проверяющий — её не нужно создавать заново."}]},{"ch":2,"type":"code","mode":"fix","q":"Нужно вывести символы со второго по четвёртый включительно (считая с единицы, как в обычной речи). Для «информатика» это \u003ccode>нфо\u003c/code>. Программа ошибается на единицу — почини.","starter":"print(s[2:4])","sol":"print(s[1:4])","tests":[{"prelude":"s = \"информатика\"","expect":"нфо"},{"prelude":"s = \"python\"","expect":"yth"},{"prelude":"s = \"abcdef\"","expect":"bcd"}],"hint":"Второй символ имеет индекс 1, четвёртый — индекс 3, а правая граница среза не включается.","id":"t14","forbid":[{"re":"(^|\\n)\\s*s\\s*=[^=]","msg":"Переменную s задаёт проверяющий — её не нужно создавать заново."}]},{"ch":2,"type":"multi","q":"Переменная \u003ccode>s\u003c/code> хранит строку \u003ccode>\"питон\"\u003c/code>. Отметь \u003cb>все\u003c/b> выражения, значение которых равно \u003ccode>\"тон\"\u003c/code>.","options":["s[2:]","s[-3:]","s[2:5]","s[2:4]","s[3:]","s[len(s) - 3:]"],"correct":[0,1,2,5],"explain":"«тон» начинается с индекса 2. Правая граница может быть пропущена, равна длине (5) или задана через len(s). s[2:4] теряет последнюю букву, а s[3:] начинается со следующей.","id":"t15"},{"ch":2,"type":"code","mode":"write","q":"Переменная \u003ccode>s\u003c/code> хранит слово. Выведи \u003ccode>Палиндром\u003c/code>, если оно читается одинаково в обе стороны без учёта регистра, иначе — \u003ccode>Не палиндром\u003c/code>.","starter":"","sol":"t = s.lower()\nif t == t[::-1]:\n    print(\"Палиндром\")\nelse:\n    print(\"Не палиндром\")","tests":[{"prelude":"s = \"Шалаш\"","expect":"Палиндром"},{"prelude":"s = \"питон\"","expect":"Не палиндром"},{"prelude":"s = \"Анна\"","expect":"Палиндром"},{"prelude":"s = \"Я\"","expect":"Палиндром"}],"require":[{"re":"\\[::-1\\]","msg":"Разворот — срез s[::-1]."},{"re":"lower\\(\\)","msg":"«Шалаш» — палиндром только после приведения к одному регистру."}],"hint":"Сначала приведи к нижнему регистру и сохрани, потом сравни строку с её разворотом.","id":"t16","forbid":[{"re":"(^|\\n)\\s*s\\s*=[^=]","msg":"Переменную s задаёт проверяющий — её не нужно создавать заново."}]},{"ch":3,"type":"predict","q":"Что напечатает программа?","code":"print(\"2026\".isdigit(), \"12.5\".isdigit(), \"\".isdigit())\nprint(\"Привет\".isalpha(), \"Привет мир\".isalpha(), \"ok\".isalpha())\nprint(\"ivan_ov\".isalnum(), \"ivan2026\".isalnum())","explain":"isdigit() — только цифры и хотя бы одна: точка, минус и пустая строка дают False. isalpha() — только буквы любого алфавита, пробел ломает. isalnum() пропускает буквы и цифры, но не подчёркивание.","id":"t17","answer":"True False False\nTrue False True\nFalse True"},{"ch":3,"type":"mcq","q":"Чему равно \u003ccode>\"ааа\".count(\"аа\")\u003c/code>?","options":["2","1","3","0"],"correct":1,"explain":"count() считает неперекрывающиеся вхождения: найдя «аа» с начала, он продолжает искать после него, а там остаётся одна «а».","id":"t18"},{"ch":3,"type":"mcq","q":"Что напечатает программа?\u003cpre>\u003ccode>w = \"abc\"\nif w.isdigit:\n    print(\"число\")\nelse:\n    print(\"не число\")\u003c/code>\u003c/pre>","options":["число","не число","ошибку","ничего"],"correct":0,"explain":"Без скобок w.isdigit — это сам метод, а не результат его вызова. Любой метод как объект считается истинным, поэтому условие всегда выполняется. Скобки обязательны: w.isdigit().","id":"t19"},{"ch":3,"type":"code","mode":"write","q":"Переменная \u003ccode>vozrast\u003c/code> хранит строку. Если это целое число, выведи \u003ccode>Через 10 лет: 25\u003c/code> (для «15»), иначе — \u003ccode>Это не число\u003c/code>.","starter":"","sol":"if vozrast.isdigit():\n    print(f\"Через 10 лет: {int(vozrast) + 10}\")\nelse:\n    print(\"Это не число\")","tests":[{"prelude":"vozrast = \"15\"","expect":"Через 10 лет: 25"},{"prelude":"vozrast = \"пятнадцать\"","expect":"Это не число"},{"prelude":"vozrast = \"1.5\"","expect":"Это не число"},{"prelude":"vozrast = \"-5\"","expect":"Это не число"}],"require":[{"re":"isdigit\\(\\)","msg":"Проверка «только цифры» — это isdigit() со скобками."}],"hint":"isdigit() отвергает и точку, и минус — для таких строк int() бы упал.","id":"t20","forbid":[{"re":"(^|\\n)\\s*vozrast\\s*=[^=]","msg":"Переменную vozrast задаёт проверяющий — её не нужно создавать заново."}]},{"ch":3,"type":"code","mode":"write","q":"Переменная \u003ccode>name\u003c/code> хранит имя файла. Если оно (без учёта регистра) заканчивается на \u003ccode>.jpg\u003c/code> или \u003ccode>.png\u003c/code> — выведи \u003ccode>Картинка\u003c/code>; на \u003ccode>.txt\u003c/code> или \u003ccode>.docx\u003c/code> — \u003ccode>Документ\u003c/code>; иначе \u003ccode>Неизвестный тип\u003c/code>.","starter":"","sol":"n = name.lower()\nif n.endswith(\".jpg\") or n.endswith(\".png\"):\n    print(\"Картинка\")\nelif n.endswith(\".txt\") or n.endswith(\".docx\"):\n    print(\"Документ\")\nelse:\n    print(\"Неизвестный тип\")","tests":[{"prelude":"name = \"photo.JPG\"","expect":"Картинка"},{"prelude":"name = \"report.docx\"","expect":"Документ"},{"prelude":"name = \"notes.txt\"","expect":"Документ"},{"prelude":"name = \"archive.zip\"","expect":"Неизвестный тип"},{"prelude":"name = \"img.png\"","expect":"Картинка"}],"require":[{"re":"endswith","msg":"Окончание проверяют методом endswith()."},{"re":"lower\\(\\)","msg":"«.JPG» пройдёт проверку только после lower()."}],"hint":"Приведи имя к нижнему регистру один раз, сохрани и проверяй endswith() через or.","id":"t21","forbid":[{"re":"(^|\\n)\\s*name\\s*=[^=]","msg":"Переменную name задаёт проверяющий — её не нужно создавать заново."}]},{"ch":3,"type":"multi","q":"Переменная \u003ccode>name\u003c/code> хранит имя файла. Отметь \u003cb>все\u003c/b> выражения, которые истинны в точности тогда, когда имя заканчивается на \u003ccode>.jpg\u003c/code> или на \u003ccode>.png\u003c/code>.","options":["name.endswith(\".jpg\") or name.endswith(\".png\")","name.endswith(\".jpg\") and name.endswith(\".png\")","name[-4:] == \".jpg\" or name[-4:] == \".png\"","\".jpg\" in name or \".png\" in name","name.endswith(\".jpg\" or \".png\")"],"correct":[0,2],"explain":"Два допустимых окончания — это or, а через and строка должна была бы кончаться на оба сразу. Оператор in найдёт «.jpg» и в середине имени «c.jpg.txt». Выражение \".jpg\" or \".png\" вычисляется в \".jpg\", так что последний вариант проверяет только одно окончание.","id":"t22"},{"ch":3,"type":"code","mode":"fix","q":"Программа должна считать, сколько раз буква «а» встречается в строке \u003ccode>s\u003c/code> без учёта регистра. Для «Анна Ахматова» ответ 5, а программа выводит 3. Почини.","starter":"print(s.count(\"а\"))","sol":"print(s.lower().count(\"а\"))","tests":[{"prelude":"s = \"Анна Ахматова\"","expect":"5"},{"prelude":"s = \"АААа\"","expect":"4"},{"prelude":"s = \"мир\"","expect":"0"}],"require":[{"re":"count\\(","msg":"Считать вхождения удобнее всего методом count()."}],"hint":"count() различает «А» и «а». Приведи строку к одному регистру перед подсчётом.","id":"t23","forbid":[{"re":"(^|\\n)\\s*s\\s*=[^=]","msg":"Переменную s задаёт проверяющий — её не нужно создавать заново."}]},{"ch":3,"type":"predict","q":"Что напечатает программа?","code":"w = \"Анна\"\nprint(w.startswith(\"а\"), w.lower().startswith(\"а\"))\nprint(w.endswith(\"на\"), w.endswith(\"Анна\"), w.endswith(\"\"))\nprint(w.count(\"н\"), w.count(\"нн\"), w.count(\"н\") * 2)","explain":"startswith и endswith различают регистр. Строка заканчивается на саму себя и на пустую строку. count(\"нн\") находит одно вхождение из двух букв, а count(\"н\") — две отдельные буквы.","id":"t24","answer":"False True\nTrue True True\n2 1 4"},{"ch":4,"type":"predict","q":"Что напечатает программа?","code":"s = \"пРИВЕТ, мИр 2026\"\nprint(s.upper())\nprint(s.lower())\nprint(s.capitalize())\nprint(s.title())\nprint(s.swapcase())","explain":"capitalize() поднимает только первую букву строки и опускает все остальные. title() делает заглавной первую букву каждого слова. swapcase() меняет регистр каждой буквы на противоположный. Цифры и знаки не трогает ни один метод.","id":"t25","answer":"ПРИВЕТ, МИР 2026\nпривет, мир 2026\nПривет, мир 2026\nПривет, Мир 2026\nПривет, МиР 2026"},{"ch":4,"type":"code","mode":"fix","q":"Программа должна вывести слово из переменной \u003ccode>s\u003c/code> заглавными буквами, но печатает его как было. Почини.","starter":"s.upper()\nprint(s)","sol":"s = s.upper()\nprint(s)","tests":[{"prelude":"s = \"тише\"","expect":"ТИШЕ"},{"prelude":"s = \"Ok\"","expect":"OK"}],"hint":"Методы строк не меняют строку, а возвращают новую. Результат нужно сохранить или сразу напечатать.","id":"t26","forbid":[]},{"ch":4,"type":"mcq","q":"Чему равно \u003ccode>\"петров-водкин\".title()\u003c/code>?","options":["\"Петров-водкин\"","\"Петров-Водкин\"","\"ПЕТРОВ-ВОДКИН\"","\"петров-Водкин\""],"correct":1,"explain":"Для title() границей слова служит любой символ, кроме буквы, — дефис тоже. Поэтому после него буква снова становится заглавной. Ровно одну заглавную даёт capitalize().","id":"t27"},{"ch":4,"type":"multi","q":"Переменная \u003ccode>s\u003c/code> хранит \u003ccode>\"пРИВЕТ\"\u003c/code>. Отметь \u003cb>все\u003c/b> выражения, значение которых равно \u003ccode>\"Привет\"\u003c/code>.","options":["s.capitalize()","s.title()","s[0].upper() + s[1:].lower()","s.upper()","s.lower().capitalize()","s.swapcase()"],"correct":[0,1,2,4,5],"explain":"capitalize(), title() и ручная склейка первой буквы с хвостом дают одно и то же для одного слова. Лишний lower() перед capitalize() не вредит. Даже swapcase() здесь подходит — но только потому, что в исходной строке регистр каждой буквы был ровно «наоборот»; для «пРиВеТ» он бы уже не сработал.","id":"t28"},{"ch":4,"type":"code","mode":"write","q":"Переменные \u003ccode>name\u003c/code> и \u003ccode>familiya\u003c/code> введены как попало. Выведи имя с одной заглавной буквы, а фамилию — целиком заглавными: \u003ccode>Иван ПЕТРОВ\u003c/code>.","starter":"","sol":"print(f\"{name.capitalize()} {familiya.upper()}\")","tests":[{"prelude":"name = \"иВАН\"\nfamiliya = \"петров\"","expect":"Иван ПЕТРОВ"},{"prelude":"name = \"МАРИЯ\"\nfamiliya = \"сидорова-белая\"","expect":"Мария СИДОРОВА-БЕЛАЯ"}],"require":[{"re":"capitalize\\(\\)","msg":"Одна заглавная буква и остальные строчные — это capitalize()."},{"re":"upper\\(\\)","msg":"Целиком заглавными — upper()."}],"hint":"Оба метода можно вызвать прямо внутри f-строки.","id":"t29","forbid":[{"re":"(^|\\n)\\s*name\\s*=[^=]","msg":"Переменную name задаёт проверяющий — её не нужно создавать заново."},{"re":"(^|\\n)\\s*familiya\\s*=[^=]","msg":"Переменную familiya задаёт проверяющий — её не нужно создавать заново."}]},{"ch":4,"type":"predict","q":"Что напечатает программа?","code":"a = \"ДА\"\nb = \"да\"\nprint(a == b, a.lower() == b.lower())\nprint(a.isupper(), b.islower(), \"Да\".isupper())\nprint(\"123\".isupper(), \"ПРИВЕТ!\".isupper())","explain":"Строки с разным регистром не равны — сравнивают их после lower() с обеих сторон. isupper() требует, чтобы все буквы были заглавными и хотя бы одна буква была: «123» без букв даёт False, а знак «!» проверке не мешает.","id":"t30","answer":"False True\nTrue True False\nFalse True"},{"ch":5,"type":"predict","q":"Что напечатает программа?","code":"s = \"питон\"\nprint(f\"{s.upper()} — {len(s)} букв\")\nprint(f\"первая {s[0]}, последняя {s[-1]}, наоборот {s[::-1]}\")\nprint(f\"{s.count('т')} буква т, есть о: {'о' in s}\")","explain":"Внутри фигурных скобок работает любое выражение: вызов метода, срез, len(), даже проверка in — её результат печатается как True или False. Строки внутри скобок берут в другие кавычки, чем сама f-строка.","id":"t31","answer":"ПИТОН — 5 букв\nпервая п, последняя н, наоборот нотип\n1 буква т, есть о: True"},{"ch":5,"type":"code","mode":"fix","q":"Программа должна печатать \u003ccode>Цена: 1234.50 руб, со скидкой 1111.05 руб\u003c/code> — оба числа с двумя знаками после точки. Сейчас она печатает фигурные скобки. Почини.","starter":"print(\"Цена: {cena} руб, со скидкой {cena * 0.9} руб\")","sol":"print(f\"Цена: {cena:.2f} руб, со скидкой {cena * 0.9:.2f} руб\")","tests":[{"prelude":"cena = 1234.5","expect":"Цена: 1234.50 руб, со скидкой 1111.05 руб"},{"prelude":"cena = 100","expect":"Цена: 100.00 руб, со скидкой 90.00 руб"}],"require":[{"re":"f\\s*[\"']","msg":"Без буквы f скобки остаются текстом."},{"re":":\\.2f","msg":"Два знака после точки — формат :.2f после выражения."}],"hint":"Формат пишется после выражения через двоеточие: {cena * 0.9:.2f}.","id":"t32","forbid":[{"re":"(^|\\n)\\s*cena\\s*=[^=]","msg":"Переменную cena задаёт проверяющий — её не нужно создавать заново."}]},{"ch":5,"type":"predict","q":"Что напечатает программа? Считай пробелы внимательно — квадратные скобки помогут.","code":"name = \"чай\"\nprice = 120\nprint(f\"[{name:\u003c6}][{name:>6}][{name:^6}]\")\nprint(f\"[{price:>6}][{price:06}]\")\nprint(f\"{{price}} = {price}\")","explain":"Число после двоеточия — ширина поля; \u003c прижимает влево, > вправо, ^ по центру (лишний пробел уходит вправо). 06 дополняет число нулями слева. Двойные скобки {{ }} печатаются как обычные скобки.","id":"t33","answer":"[чай   ][   чай][ чай  ]\n[   120][000120]\n{price} = 120"},{"ch":5,"type":"multi","q":"Переменная \u003ccode>n\u003c/code> равна 3. Отметь \u003cb>все\u003c/b> строки кода, которые напечатают в точности \u003ccode>Итого: 3 товара\u003c/code>.","options":["print(f\"Итого: {n} товара\")","print(\"Итого: {n} товара\")","print(\"Итого:\", n, \"товара\")","print(\"Итого: \" + n + \" товара\")","print(\"Итого: \" + str(n) + \" товара\")","print(f\"Итого: n товара\")"],"correct":[0,2,4],"explain":"Три рабочих способа: f-строка, print с запятыми (он сам ставит пробелы) и склейка после str(n). Без f скобки печатаются как есть, без скобок внутри f-строки имя переменной — просто буква n, а строку с числом складывать нельзя.","id":"t34"},{"ch":5,"type":"code","mode":"write","q":"Переменная \u003ccode>word\u003c/code> хранит слово. Выведи одной f-строкой: \u003ccode>Слово «питон»: 5 букв, начинается с п, заканчивается на н\u003c/code>.","starter":"","sol":"print(f\"Слово «{word}»: {len(word)} букв, начинается с {word[0]}, заканчивается на {word[-1]}\")","tests":[{"prelude":"word = \"питон\"","expect":"Слово «питон»: 5 букв, начинается с п, заканчивается на н"},{"prelude":"word = \"экзамен\"","expect":"Слово «экзамен»: 7 букв, начинается с э, заканчивается на н"},{"prelude":"word = \"я\"","expect":"Слово «я»: 1 букв, начинается с я, заканчивается на я"}],"require":[{"re":"f\\s*[\"']","msg":"Задание на f-строку."},{"re":"len\\(","msg":"Количество букв — len()."}],"hint":"Внутри одной f-строки четыре подстановки: само слово, len(word), word[0] и word[-1].","id":"t35","forbid":[{"re":"(^|\\n)\\s*word\\s*=[^=]","msg":"Переменную word задаёт проверяющий — её не нужно создавать заново."}]},{"ch":6,"type":"predict","q":"Что напечатает программа?","code":"words = [\"раз\", \"два\", \"три\"]\nprint(\", \".join(words))\nprint(\"\".join(words))\nprint(\"-\".join(\"abc\"))\nprint(\" \".join(words[::-1]))","explain":"join вызывается у разделителя, а список идёт в скобки. Пустой разделитель склеивает без ничего. Строка тоже последовательность — join расставит дефисы между её буквами. Срез списка [::-1] переворачивает порядок слов.","id":"t36","answer":"раз, два, три\nраздватри\na-b-c\nтри два раз"},{"ch":6,"type":"mcq","q":"Что даст \u003ccode>\", \".join([1, 2, 3])\u003c/code>?","options":["\"1, 2, 3\"","ошибку TypeError","\"[1, 2, 3]\"","\"123\""],"correct":1,"explain":"join склеивает только строки. Числа сначала нужно перевести через str() — например, в цикле — или напечатать иначе: print(*nums, sep=\", \").","id":"t37"},{"ch":6,"type":"code","mode":"fix","q":"Программа должна вывести слова через запятую с пробелом, а падает с AttributeError. Почини порядок вызова.","starter":"print(words.join(\", \"))","sol":"print(\", \".join(words))","tests":[{"prelude":"words = [\"кот\", \"пёс\", \"ёж\"]","expect":"кот, пёс, ёж"},{"prelude":"words = [\"один\"]","expect":"один"}],"require":[{"re":"join","msg":"Склейка списка в строку — это join."}],"hint":"У списка нет метода join. Разделитель стоит слева, список — в скобках.","id":"t38","forbid":[{"re":"(^|\\n)\\s*words\\s*=[^=]","msg":"Переменную words задаёт проверяющий — её не нужно создавать заново."}]},{"ch":6,"type":"predict","q":"Что напечатает программа? Следи за пробелами в элементах списков.","code":"line = \"Анна, Лиза, Ира\"\nprint(line.split(\",\"))\nprint(line.split(\", \"))\nprint(line.split())\nprint(len(line.split(\", \")))","explain":"split(\",\") режет ровно по запятой, и пробелы остаются в начале элементов. split(\", \") учитывает и пробел. split() без аргумента режет по пробелам, поэтому запятые прилипают к именам. Список печатается с кавычками у каждого элемента.","id":"t39","answer":"['Анна', ' Лиза', ' Ира']\n['Анна', 'Лиза', 'Ира']\n['Анна,', 'Лиза,', 'Ира']\n3"},{"ch":6,"type":"code","mode":"write","q":"С клавиатуры вводится строка с именами через запятую и пробел, например \u003ccode>Анна, Лиза, Ира\u003c/code>. Выведи те же имена через \u003ccode> | \u003c/code> (пробел, черта, пробел).","starter":"line = input()\n","sol":"line = input()\nprint(\" | \".join(line.split(\", \")))","tests":[{"stdin":["Анна, Лиза, Ира"],"expect":"Анна | Лиза | Ира"},{"stdin":["Один"],"expect":"Один"},{"stdin":["a, b"],"expect":"a | b"}],"require":[{"re":"split\\(\", \"\\)","msg":"Разделитель на входе — запятая с пробелом: split(\", \")."},{"re":"join","msg":"Собрать обратно в строку — join."}],"hint":"Сначала split(\", \"), потом \" | \".join(...) — можно в одну строку.","id":"t40","forbid":[]},{"ch":6,"type":"code","mode":"write","q":"С клавиатуры вводится предложение. Выведи его слова в обратном порядке через один пробел. Лишние пробелы между словами во входной строке нужно убрать.","starter":"line = input()\n","sol":"line = input()\nwords = line.split()\nprint(\" \".join(words[::-1]))","tests":[{"stdin":["мама мыла раму"],"expect":"раму мыла мама"},{"stdin":["один"],"expect":"один"},{"stdin":["раз  два   три"],"expect":"три два раз"}],"require":[{"re":"split\\(\\)","msg":"Лишние пробелы уберёт split() без аргумента."},{"re":"\\[::-1\\]","msg":"Обратный порядок — срез [::-1] у списка слов."},{"re":"join","msg":"Соединить слова — join."}],"hint":"split() → срез списка [::-1] → \" \".join(...).","id":"t41","forbid":[]},{"ch":6,"type":"code","mode":"fix","q":"Список чисел нужно вывести через запятую с пробелом: \u003ccode>1, 2, 3\u003c/code>. Программа падает с TypeError. Почини любым способом.","starter":"print(\", \".join(nums))","sol":"print(*nums, sep=\", \")","tests":[{"prelude":"nums = [1, 2, 3]","expect":"1, 2, 3"},{"prelude":"nums = [7]","expect":"7"},{"prelude":"nums = [10, 20]","expect":"10, 20"}],"hint":"Либо переведи каждое число в строку через str() в цикле и собери новый список, либо обойдись без join: print(*nums, sep=\", \").","id":"t42","forbid":[{"re":"(^|\\n)\\s*nums\\s*=[^=]","msg":"Переменную nums задаёт проверяющий — её не нужно создавать заново."}]},{"ch":7,"type":"predict","q":"Пользователь вводит по очереди: \u003ccode>яблоко\u003c/code>, \u003ccode>Груша\u003c/code>, \u003ccode>СТОП СЛОВО\u003c/code>, \u003ccode>слива\u003c/code>. Что напечатает программа?","code":"s = []\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    else:\n        s.append(word)\nprint(s)\nprint(len(s))","stdin":["яблоко","Груша","СТОП СЛОВО","слива"],"explain":"break прерывает цикл сразу, поэтому «слива» уже не читается. Список печатается с кавычками у каждого элемента, регистр слов сохраняется.","id":"t43","answer":"['яблоко', 'Груша']\n2"},{"ch":7,"type":"code","mode":"write","q":"Слова вводятся по одному до \u003ccode>СТОП СЛОВО\u003c/code>. Собери их в список и после цикла выведи через запятую с пробелом. Заготовка — как в задании 5.","starter":"s = []\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    else:\n        # ваш код\nprint()","sol":"s = []\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    else:\n        s.append(word)\nprint(\", \".join(s))","tests":[{"stdin":["яблоко","груша","слива","СТОП СЛОВО"],"expect":"яблоко, груша, слива"},{"stdin":["один","СТОП СЛОВО"],"expect":"один"},{"stdin":["СТОП СЛОВО","лишнее"],"expect":""}],"require":[{"re":"append","msg":"Добавление в список — append()."},{"re":"join","msg":"Вывод через запятую — join."},{"re":"break","msg":"Выход из цикла — break."}],"hint":"В ветке else — s.append(word), после цикла — print(\", \".join(s)). Если слов не было, печатается пустая строка.","id":"t44","forbid":[]},{"ch":7,"type":"code","mode":"write","q":"Слова вводятся до \u003ccode>СТОП СЛОВО\u003c/code>. Посчитай, сколько из них начинается с заглавной буквы, и выведи \u003ccode>С заглавной: 2\u003c/code>.","starter":"n = 0\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    # ваш код\n","sol":"n = 0\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    if word[0].isupper():\n        n += 1\nprint(f\"С заглавной: {n}\")","tests":[{"stdin":["Анна","лиза","Ира","СТОП СЛОВО"],"expect":"С заглавной: 2"},{"stdin":["кот","пёс","СТОП СЛОВО"],"expect":"С заглавной: 0"},{"stdin":["СТОП СЛОВО"],"expect":"С заглавной: 0"}],"require":[{"re":"isupper\\(\\)","msg":"Заглавная буква — isupper() со скобками."},{"re":"\\[0\\]","msg":"Первая буква слова — word[0]."}],"hint":"word[0].isupper() — проверка первой буквы; счётчик увеличивай внутри цикла, а печатай после.","id":"t45","forbid":[]},{"ch":7,"type":"code","mode":"write","q":"Строки вводятся до \u003ccode>СТОП СЛОВО\u003c/code>. Сложи только те из них, что являются целыми числами, и выведи \u003ccode>Сумма: 42\u003c/code>.","starter":"total = 0\nwhile True:\n    w = input()\n    if w == 'СТОП СЛОВО':\n        break\n    # ваш код\n","sol":"total = 0\nwhile True:\n    w = input()\n    if w == 'СТОП СЛОВО':\n        break\n    if w.isdigit():\n        total += int(w)\nprint(f\"Сумма: {total}\")","tests":[{"stdin":["12","abc","30","СТОП СЛОВО"],"expect":"Сумма: 42"},{"stdin":["5","5","5","СТОП СЛОВО"],"expect":"Сумма: 15"},{"stdin":["-5","1.5","СТОП СЛОВО"],"expect":"Сумма: 0"}],"require":[{"re":"isdigit\\(\\)","msg":"Целое число проверяют через isdigit()."},{"re":"int\\(","msg":"Прежде чем складывать, строку переводят в int()."}],"hint":"isdigit() отсеет и «abc», и «-5», и «1.5» — их int() не примет.","id":"t46","forbid":[]},{"ch":7,"type":"code","mode":"fix","q":"Программа должна собрать слова до стоп-слова и один раз напечатать список. Сейчас она печатает список и продолжает читать ввод. Почини.","starter":"s = []\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        print(s)\n    else:\n        s.append(word)","sol":"s = []\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    else:\n        s.append(word)\nprint(s)","tests":[{"stdin":["кот","пёс","СТОП СЛОВО"],"expect":"['кот', 'пёс']"},{"stdin":["СТОП СЛОВО"],"expect":"[]"}],"require":[{"re":"break","msg":"Остановить while True может только break."}],"hint":"На стоп-слове нужен break, а print — после цикла, без отступа.","id":"t47","forbid":[]},{"ch":7,"type":"code","mode":"fix","q":"Программа считает слова до стоп-слова и должна напечатать итог один раз, например \u003ccode>3\u003c/code>. Сейчас она печатает счётчик на каждом шаге. Почини.","starter":"n = 0\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    n += 1\n    print(n)","sol":"n = 0\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    n += 1\nprint(n)","tests":[{"stdin":["а","б","в","СТОП СЛОВО"],"expect":"3"},{"stdin":["СТОП СЛОВО"],"expect":"0"}],"hint":"Отступ решает, что внутри цикла, а что после него.","id":"t48","forbid":[]},{"ch":7,"type":"predict","q":"Вводятся строки: \u003ccode>a\u003c/code>, \u003ccode>стоп слово\u003c/code>, \u003ccode>b\u003c/code>, \u003ccode>СТОП СЛОВО\u003c/code>. Что напечатает программа?","code":"n = 0\nwhile True:\n    w = input()\n    if w == 'СТОП СЛОВО':\n        break\n    if w.lower() == 'стоп слово':\n        print(\"почти стоп\")\n    n += 1\nprint(n)","stdin":["a","стоп слово","b","СТОП СЛОВО"],"explain":"Сравнение строк учитывает регистр: «стоп слово» строчными не останавливает цикл, а лишь попадает во второй if и считается как обычное слово. Всего до настоящего стоп-слова прошло три строки.","id":"t49","answer":"почти стоп\n3"},{"ch":7,"type":"code","mode":"write","q":"Слова вводятся до \u003ccode>СТОП СЛОВО\u003c/code>. Выведи самое длинное из них. Если несколько слов одинаковой длины — то, что встретилось раньше.","starter":"longest = \"\"\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    # ваш код\n","sol":"longest = \"\"\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    if len(word) > len(longest):\n        longest = word\nprint(longest)","tests":[{"stdin":["кот","собака","рыба","СТОП СЛОВО"],"expect":"собака"},{"stdin":["мяу","гав","СТОП СЛОВО"],"expect":"мяу"},{"stdin":["а","бб","ввв","СТОП СЛОВО"],"expect":"ввв"}],"require":[{"re":"len\\(","msg":"Длину слова даёт len()."}],"hint":"Сравнивай len(word) со len(longest) строго через >, тогда при равной длине останется первое слово.","id":"t50","forbid":[]},{"ch":8,"type":"multi","q":"В переменной \u003ccode>dolg\u003c/code> хранится 1, если у ученика есть долги, и 0, если нет. В \u003ccode>sredniy\u003c/code> — вещественный средний балл, в \u003ccode>olimp\u003c/code> — 1, если он призёр олимпиады, иначе 0.\u003cbr>Ученик допущен к экзамену, если у него \u003cu>нет долгов\u003c/u> и выполняется \u003cu>хотя бы одно\u003c/u>: средний балл \u003cu>не меньше 4.5\u003c/u> или он призёр олимпиады.\u003cbr>Отметь \u003cb>все\u003c/b> выражения (минимум два), которые проверяют, допущен ли ученик.","options":["dolg == 0 and (sredniy >= 4.5 or olimp == 1)","dolg != 1 and (sredniy >= 4.5 or olimp != 0)","dolg == 0 and sredniy >= 4.5 or olimp == 1","not(dolg == 1) and (not(sredniy \u003c 4.5) or olimp == 1)","dolg = 0 and (sredniy >= 4.5 or olimp == 1)"],"correct":[0,1,3],"explain":"Раз dolg бывает только 0 или 1, «== 0» и «!= 1» — одно и то же, а not(sredniy \u003c 4.5) — то же, что sredniy >= 4.5. В третьем варианте нет скобок: and выполняется раньше or, и призёр с долгами окажется допущен. Пятый вариант — присваивание вместо сравнения, это ошибка синтаксиса.","id":"t51"},{"ch":8,"type":"multi","q":"Переменная \u003ccode>w\u003c/code> хранит строку. Слово подходит для игры, если его длина \u003cu>от 3 до 8 включительно\u003c/u> и оно \u003cu>состоит только из букв\u003c/u>.\u003cbr>Отметь \u003cb>все\u003c/b> выражения (минимум два), которые это проверяют.","options":["3 \u003c= len(w) \u003c= 8 and w.isalpha()","len(w) >= 3 and len(w) \u003c= 8 and w.isalpha()","len(w) > 3 and len(w) \u003c 8 and w.isalpha()","not (len(w) \u003c 3 or len(w) > 8) and w.isalpha()","3 \u003c= len(w) \u003c= 8 and w.isalpha","3 \u003c= len(w) \u003c= 8 or w.isalpha()"],"correct":[0,1,3],"explain":"«Включительно» требует нестрогих знаков — третий вариант отбрасывает слова длиной ровно 3 и 8. Четвёртый — то же условие, записанное через отрицание (правило де Моргана). В пятом isalpha без скобок всегда истинен, в шестом or вместо and пропустит «12345».","id":"t52"},{"ch":8,"type":"multi","q":"В \u003ccode>name\u003c/code> — имя файла, в \u003ccode>size\u003c/code> — его размер в килобайтах. Файл принимается, если расширение \u003ccode>.py\u003c/code> (\u003cu>регистр не важен\u003c/u>) и размер \u003cu>меньше 100\u003c/u>.\u003cbr>Отметь \u003cb>все\u003c/b> подходящие выражения (минимум два).","options":["name.lower().endswith(\".py\") and size \u003c 100","name.lower().endswith(\".py\") and not size >= 100","name.endswith(\".py\") and size \u003c 100","name.lower().endswith(\".py\") and size \u003c= 100","not (not name.lower().endswith(\".py\") or size >= 100)"],"correct":[0,1,4],"explain":"not size >= 100 — это size \u003c 100. Третий вариант без lower() отвергнет «b.PY», четвёртый пропускает ровно 100. Пятый — двойное отрицание по де Моргану: not(not A or not B) равно A and B.","id":"t53"},{"ch":8,"type":"multi","q":"Переменная \u003ccode>msg\u003c/code> хранит сообщение. Оно публикуется, если \u003cu>не пустое\u003c/u> и \u003cu>не написано целиком заглавными\u003c/u> буквами.\u003cbr>Отметь \u003cb>все\u003c/b> выражения (минимум два), которые это проверяют.","options":["len(msg) > 0 and not msg.isupper()","msg != \"\" and not msg.isupper()","not (msg == \"\" or msg.isupper())","len(msg) > 0 and msg.islower()","not msg == \"\" and msg.isupper() == False","len(msg) > 0 or not msg.isupper()"],"correct":[0,1,2,4],"explain":"«Не капсом» — это not isupper(), а не islower(): «Привет» не капс, но и не строчными целиком, четвёртый вариант его отвергнет. Пятый вариант некрасив, но верен: not msg == \"\" читается как not (msg == \"\"). Шестой через or пропустит пустое сообщение.","id":"t54"},{"ch":9,"type":"multi","q":"В переменных \u003ccode>money\u003c/code> и \u003ccode>price\u003c/code> — деньги и цена одного билета. Если деньги делятся на цену без остатка, программа печатает только \u003ccode>Денег хватает ровно на билеты!\u003c/code>. Иначе печатает, сколько билетов куплено и сколько денег осталось. Для значений из кода ожидается вывод справа. Отметь \u003cb>все\u003c/b> причины (минимум две), по которым код не работает как ожидается.","code":"money = 1500\nprice = 350\n\nif money % price = 0:\n    print('Денег хватает ровно на билеты!')\nelse:\n    count = money / price\n    print(f'Покупаем {count} билета')\n    rest = money - count * price\nprint(f'Сдача: {rest} рублей')","options":["В строке [4] вместо одного знака = должно стоять ==","В строке [5] отсутствует префикс f перед строкой","В строке [7] вместо оператора / должен стоять //","В строке [9] вместо * должен стоять //","В строке [10] отсутствует отступ перед print()"],"correct":[0,2,4],"explain":"Сравнение в условии — ==. Обычное деление даёт 4.285…, а билетов должно быть целое число — нужно //. print со сдачей относится к ветке «иначе», поэтому обязан быть с отступом, иначе при точном делении упадёт с NameError. В строке [5] нет подстановок — f там не нужен; в [9] умножение верное.","id":"t55","expected":"Покупаем 4 билета\nСдача: 100 рублей"},{"ch":9,"type":"multi","q":"В переменной \u003ccode>names\u003c/code> — имена через запятую и пробел. Программа должна печатать имена, которые начинаются с \u003ccode>И\u003c/code> \u003cb>и\u003c/b> заканчиваются на \u003ccode>а\u003c/code>. Ожидаемый вывод справа. Отметь \u003cb>все\u003c/b> причины (минимум две), по которым код не работает.","code":"names = 'Олег, Инна, Ольга, Иван, Игорь, Оксана'\n\nfor name in names.split():\n    if name[0] == 'И' or name[-1] == 'а':\n    print(name)","options":["В строке [4] вместо оператора or должен стоять оператор and","В строке [3] в цикле for вместо переменной name должна использоваться переменная i","В строке [3] неверно указан разделитель в методе split()","В строке [4] неверно указан индекс -1","В строке [5] отсутствует отступ перед функцией print()"],"correct":[0,2,4],"explain":"split() без аргумента режет по пробелам, и запятые прилипают к именам: «Инна,» заканчивается на запятую. Условие «и то, и другое» — это and, а с or напечатались бы и Ольга с Оксаной. Тело if обязано стоять с отступом. Имя переменной цикла и индекс -1 — верные.","id":"t56","expected":"Инна"},{"ch":9,"type":"multi","q":"Программа читает слово и печатает \u003ccode>Палиндром\u003c/code>, если оно читается одинаково в обе стороны без учёта регистра, иначе \u003ccode>Не палиндром\u003c/code>. Для ввода \u003ccode>Шалаш\u003c/code> ожидается вывод справа. Отметь \u003cb>все\u003c/b> причины (минимум две), по которым код не работает.","code":"word = input()\nword = word.lower\nif word == word[::1]:\n    print('Палиндром')\nelse:\n    print('Не палиндром')","stdin":["Шалаш"],"options":["В строке [1] нужно написать int(input())","В строке [2] у метода lower пропущены скобки","В строке [3] срез [::1] не переворачивает строку — нужен [::-1]","В строке [3] вместо == должен стоять один знак =","В строке [4] print() не должен иметь отступ"],"correct":[1,2],"explain":"Без скобок в word кладётся сам метод, а не строка, и срез от него упадёт с TypeError. Шаг 1 оставляет строку как есть — сравнение с самой собой всегда истинно, а разворачивает только шаг -1. Остальные строки верны: слово не число, в условии нужно ==, а print в ветке должен быть с отступом.","id":"t57","expected":"Палиндром"},{"ch":9,"type":"multi","q":"Программа читает строки до \u003ccode>СТОП СЛОВО\u003c/code> и должна один раз напечатать, сколько из них были целыми числами. Для ввода \u003ccode>12\u003c/code>, \u003ccode>abc\u003c/code>, \u003ccode>7\u003c/code>, \u003ccode>СТОП СЛОВО\u003c/code> ожидается вывод справа. Отметь \u003cb>все\u003c/b> причины (минимум две), по которым код не работает.","code":"count = 0\nwhile True:\n    w = input()\n    if w == 'СТОП СЛОВО':\n        break\n    if w.isdigit:\n        count += 1\n    print(count)","stdin":["12","abc","7","СТОП СЛОВО"],"options":["В строке [2] вместо True должно стоять условие выхода","В строке [5] break должен быть без отступа","В строке [6] у метода isdigit пропущены скобки","В строке [7] вместо += должно стоять =","В строке [8] print() стоит внутри цикла — лишний отступ"],"correct":[2,4],"explain":"isdigit без скобок — всегда истина, поэтому считались бы все строки подряд. print с отступом выполняется на каждом витке, а нужен один раз после цикла. while True с break внутри — нормальная конструкция, а += как раз и увеличивает счётчик.","id":"t58","expected":"2"},{"ch":9,"type":"multi","q":"Программа должна отсортировать числа по возрастанию и напечатать их через запятую с пробелом. Ожидаемый вывод справа. Отметь \u003cb>все\u003c/b> причины (минимум две), по которым код не работает.","code":"nums = [3, 1, 2]\nnums.sort\nprint(', '.join(nums))","options":["В строке [1] список нужно записать в круглых скобках","В строке [2] у метода sort пропущены скобки — список не сортируется","В строке [2] метод sort() есть только у строк","В строке [3] join не умеет склеивать числа — их нужно превратить в строки","В строке [3] разделитель должен стоять внутри скобок: join(nums, ', ')"],"correct":[1,3],"explain":"nums.sort без скобок ничего не делает — это лишь обращение к методу. join склеивает только строки, поэтому элементы нужно перевести через str() или напечатать через print(*nums, sep=\", \"). Круглые скобки создали бы кортеж, sort() — метод именно списков, а порядок «разделитель.join(список)» правильный.","id":"t59","expected":"1, 2, 3"},{"ch":9,"type":"multi","q":"Программа читает слово и печатает: первую букву, последнюю букву и середину без крайних букв, всё слитно. Для \u003ccode>питон\u003c/code> ожидается вывод справа. Отметь \u003cb>все\u003c/b> причины (минимум две), по которым код не работает.","code":"s = input()\nn = len(s)\nfirst = s[1]\nlast = s[n]\nmiddle = s[1:n-1]\nprint(f'{first}{last}{middle}')","stdin":["питон"],"options":["В строке [3] первая буква имеет индекс 0, а не 1","В строке [4] индекс n выходит за границы строки — нужен n-1 или -1","В строке [5] срез должен быть s[1:n]","В строке [2] len() возвращает строку, нужно int(len(s))","В строке [6] в f-строке нельзя ставить несколько подстановок подряд"],"correct":[0,1],"explain":"Индексы начинаются с нуля, а последний равен n-1: s[n] — гарантированная IndexError. Срез s[1:n-1] как раз отбрасывает первую и последнюю буквы. len() возвращает целое число, а подстановки в f-строке можно ставить вплотную.","id":"t60","expected":"пнито"},{"ch":10,"type":"code","mode":"write","q":"Пароли вводятся до \u003ccode>СТОП СЛОВО\u003c/code>. Хороший пароль: длина не меньше 8, только буквы и цифры, и при этом не только буквы и не только цифры. После ввода выведи \u003ccode>Хороших паролей: 2\u003c/code>.","starter":"n = 0\nwhile True:\n    p = input()\n    if p == 'СТОП СЛОВО':\n        break\n    # ваш код\n","sol":"n = 0\nwhile True:\n    p = input()\n    if p == 'СТОП СЛОВО':\n        break\n    if len(p) >= 8 and p.isalnum() and not p.isalpha() and not p.isdigit():\n        n += 1\nprint(f\"Хороших паролей: {n}\")","tests":[{"stdin":["qwerty12","abcdefgh","12345678","ab_cd1234","Zx9","Python2026","СТОП СЛОВО"],"expect":"Хороших паролей: 2"},{"stdin":["СТОП СЛОВО"],"expect":"Хороших паролей: 0"},{"stdin":["aaaa1111","СТОП СЛОВО"],"expect":"Хороших паролей: 1"}],"require":[{"re":"isalnum\\(\\)","msg":"«Только буквы и цифры» — isalnum()."},{"re":"isalpha\\(\\)","msg":"«Не только буквы» — not isalpha()."},{"re":"isdigit\\(\\)","msg":"«Не только цифры» — not isdigit()."}],"hint":"Четыре условия через and: len(p) >= 8, p.isalnum(), not p.isalpha(), not p.isdigit(). В первом тесте хороших два: qwerty12 и Python2026.","id":"t61","forbid":[]},{"ch":10,"type":"code","mode":"write","q":"Вводится строка с именами через запятую и пробел. Выведи каждое имя, которое начинается на \u003ccode>А\u003c/code> и заканчивается на \u003ccode>я\u003c/code>, с новой строки. Цикл for — как в демоверсии — уже написан.","starter":"line = input()\nfor name in line.split(\", \"):\n    # ваш код\n","sol":"line = input()\nfor name in line.split(\", \"):\n    if name[0] == \"А\" and name[-1] == \"я\":\n        print(name)","tests":[{"stdin":["Анна, Лиза, Ира, Катя, Азалия, Алла, Аня"],"expect":"Азалия\nАня"},{"stdin":["Оля, Ася"],"expect":"Ася"},{"stdin":["Ася"],"expect":"Ася"}],"require":[{"re":"\\[0\\]","msg":"Первая буква — name[0]."},{"re":"\\[-1\\]","msg":"Последняя буква — name[-1]."},{"re":"and","msg":"Оба условия сразу — and."}],"hint":"Буква «А» здесь русская. Можно и через startswith(\"А\") и endswith(\"я\").","id":"t62","forbid":[]},{"ch":10,"type":"code","mode":"write","q":"Вводится строка «имя отчество фамилия» строчными буквами, например \u003ccode>иван петрович сидоров\u003c/code>. Выведи \u003ccode>Сидоров И. П.\u003c/code>","starter":"line = input()\n","sol":"line = input()\nwords = line.split()\nprint(f\"{words[2].capitalize()} {words[0][0].upper()}. {words[1][0].upper()}.\")","tests":[{"stdin":["иван петрович сидоров"],"expect":"Сидоров И. П."},{"stdin":["анна сергеевна ким"],"expect":"Ким А. С."},{"stdin":["лев  николаевич   толстой"],"expect":"Толстой Л. Н."}],"require":[{"re":"split\\(\\)","msg":"Слова разделяют split()."},{"re":"capitalize\\(\\)","msg":"Фамилия с одной заглавной — capitalize()."},{"re":"upper\\(\\)","msg":"Инициал — первая буква в upper()."}],"hint":"words[0][0] — первая буква первого слова. Третий тест с лишними пробелами split() без аргумента переживёт.","id":"t63","forbid":[]},{"ch":10,"type":"predict","q":"Вводятся: \u003ccode>яблоко\u003c/code>, \u003ccode>Груша\u003c/code>, \u003ccode>1\u003c/code>, \u003ccode>СТОП СЛОВО\u003c/code>. Что напечатает программа?","code":"s = []\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    if word.isalpha():\n        s.append(word.capitalize())\nprint(len(s), \"-\".join(s))\nprint(s[0][0] + s[-1][-1])\nprint(\"-\".join(s)[::-1])","stdin":["яблоко","Груша","1","СТОП СЛОВО"],"explain":"«1» не проходит isalpha() и в список не попадает. Слова кладутся уже с заглавной буквы. s[0][0] — первая буква первого слова, s[-1][-1] — последняя буква последнего. Срез [::-1] применяется к уже склеенной строке и переворачивает её целиком.","id":"t64","answer":"2 Яблоко-Груша\nЯа\nашурГ-околбЯ"},{"ch":10,"type":"code","mode":"write","q":"Слова вводятся до \u003ccode>СТОП СЛОВО\u003c/code>. Выведи их через дефис заглавными буквами: \u003ccode>КОТ-ПЁС-ЁЖ\u003c/code>. Если слов не было — \u003ccode>Пусто\u003c/code>.","starter":"s = []\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    # ваш код\n","sol":"s = []\nwhile True:\n    word = input()\n    if word == 'СТОП СЛОВО':\n        break\n    s.append(word)\nif len(s) == 0:\n    print(\"Пусто\")\nelse:\n    print(\"-\".join(s).upper())","tests":[{"stdin":["кот","пёс","ёж","СТОП СЛОВО"],"expect":"КОТ-ПЁС-ЁЖ"},{"stdin":["СТОП СЛОВО"],"expect":"Пусто"},{"stdin":["Один","СТОП СЛОВО"],"expect":"ОДИН"}],"require":[{"re":"join","msg":"Собрать через дефис — join."},{"re":"upper\\(\\)","msg":"Заглавные буквы — upper()."}],"hint":"upper() можно применить один раз к результату join, а пустоту проверить через len(s) == 0 или not s.","id":"t65","forbid":[]}]};
+</script>
+<script>
+(function(){
+'use strict';
+const {chapters, tasks} = DATA;
+const $ = s => document.querySelector(s);
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if(cls) e.className = cls; if(txt!==undefined) e.textContent = txt; return e; };
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const norm = s => String(s).replace(/\r/g,'').split('\n').map(l=>l.replace(/[ \t]+$/,'')).join('\n').replace(/\n+$/,'');
+const KIND = {mcq:'выбор ответа', multi:'выбери все верные', predict:'предскажи вывод', fix:'исправь код', write:'напиши код'};
+const state = {solved:new Set(), firstTry:new Set(), seen:new Set(), tries:{}};
+const TOTAL = tasks.length;
+$('#total').textContent = TOTAL;
+const shift = (msg, k) => k ? msg.replace(/строка (\d+)/g, (m,n)=> 'строка ' + Math.max(1, Number(n)-k)) : msg;
+const lines = s => s ? s.split('\n').length : 0;
+
+function checkCode(t, src){
+  if(!src.trim()) return {ok:false, msg:'Поле пустое — напишите код.'};
+  for(const rq of (t.require||[])) if(!new RegExp(rq.re).test(src)) return {ok:false, msg:rq.msg};
+  for(const fb of (t.forbid||[])) if(new RegExp(fb.re).test(src)) return {ok:false, msg:fb.msg};
+  for(const tc of t.tests){
+    const pre = tc.prelude ? tc.prelude+'\n' : '';
+    const r = pyRun(pre+src, {stdin:(tc.stdin||[]).slice()});
+    if(r.error) return {ok:false, msg:'Программа остановилась с ошибкой.', err:shift(r.error, lines(tc.prelude)), tc};
+    const got = norm(r.output);
+    if(got !== tc.expect) return {ok:false, msg:'Программа работает, но выводит не то.', got, tc};
+  }
+  return {ok:true};
+}
+
+function numberedCode(code){
+  const pre = el('pre','code');
+  code.split('\n').forEach((line, i)=>{
+    const n = el('span','ln', ('['+(i+1)+']').padStart(5, ' ') + ' ');
+    pre.append(n, document.createTextNode(line + '\n'));
+  });
+  return pre;
+}
+function termShow(term, r, off){
+  term.style.display = 'block'; term.textContent = '';
+  if(r.output) term.append(document.createTextNode(r.output));
+  if(r.error) term.append(el('span','err', (r.output?'\n':'') + shift(r.error, off||0)));
+  if(!r.output && !r.error) term.append(el('span','muted','(программа ничего не вывела)'));
+}
+
+function taskCard(t, num){
+  const card = el('div','task'); card.id = t.id;
+  const head = el('div','t-head');
+  head.append(el('span','t-num','№'+num), el('span','t-kind', KIND[t.type==='code'?t.mode:t.type]));
+  card.append(head);
+  const q = el('div','t-q'); q.innerHTML = t.q; card.append(q);
+  const verdict = el('div');
+  const mark = (ok, html) => { verdict.className = 'verdict ' + (ok?'ok':'no'); verdict.innerHTML = html; };
+  const win = () => {
+    if(!state.solved.has(t.id)){
+      state.solved.add(t.id);
+      if((state.tries[t.id]||0) === 1 && !state.seen.has(t.id)) state.firstTry.add(t.id);
+    }
+    card.classList.add('done'); card.classList.remove('seen'); refresh();
+  };
+  const bump = () => { state.tries[t.id] = (state.tries[t.id]||0)+1; };
+
+  /* ---- один верный ответ ---- */
+  if(t.type === 'mcq'){
+    const list = el('ul','opts');
+    const btns = t.options.map((o,i)=>{
+      const b = el('button','opt'); b.type='button'; b.setAttribute('aria-pressed','false');
+      b.append(el('span','mk','абвгде'[i]+')'), el('code', null, o));
+      b.onclick = ()=>{
+        if(state.solved.has(t.id)) return;
+        bump(); btns.forEach(x=>x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true');
+        if(i === t.correct){ b.classList.add('right'); btns.forEach(x=>x.disabled=true); mark(true,'<b>Верно.</b><div class="why">'+t.explain+'</div>'); win(); }
+        else { b.classList.add('wrong'); mark(false,'<b>Не тот вариант.</b><div class="why">Попробуйте ещё раз.</div>'); }
+      };
+      const li = el('li'); li.append(b); list.append(li); return b;
+    });
+    card.append(list);
+    const acts = el('div','acts');
+    const show = el('button','b g','Показать ответ'); show.type='button';
+    show.onclick = ()=>{ state.seen.add(t.id); card.classList.add('seen'); btns.forEach((x,i)=>{ x.disabled=true; if(i===t.correct) x.classList.add('right'); }); mark(false,'<b>Правильный ответ: '+'абвгде'[t.correct]+')</b><div class="why">'+t.explain+'</div>'); refresh(); };
+    acts.append(show); card.append(acts, verdict); return card;
+  }
+
+  /* ---- несколько верных (как в демоверсии) ---- */
+  if(t.type === 'multi'){
+    if(t.code){
+      card.append(numberedCode(t.code));
+      if(t.stdin && t.stdin.length){
+        const g = el('div','given'); g.append(el('span','lbl','Что вводит пользователь'));
+        const p = el('pre'); p.textContent = t.stdin.join('\n'); g.append(p); card.append(g);
+      }
+      const g = el('div','given'); g.append(el('span','lbl','Программа должна выводить'));
+      const p = el('pre'); p.textContent = t.expected; g.append(p); card.append(g);
+    }
+    const list = el('ul','opts');
+    const sel = new Set();
+    const btns = t.options.map((o,i)=>{
+      const b = el('button','opt'); b.type='button'; b.setAttribute('role','checkbox'); b.setAttribute('aria-checked','false');
+      b.append(el('span','box'));
+      if(t.code) { const s = el('span'); s.innerHTML = esc(o).replace(/\[(\d+)\]/g,'<b>[$1]</b>'); b.append(s); }
+      else b.append(el('code', null, o));
+      b.onclick = ()=>{ if(state.solved.has(t.id) || state.seen.has(t.id)) return; if(sel.has(i)) sel.delete(i); else sel.add(i); b.setAttribute('aria-checked', String(sel.has(i))); };
+      const li = el('li'); li.append(b); list.append(li); return b;
+    });
+    card.append(list);
+    const term = el('div','term'); term.style.display='none';
+    const acts = el('div','acts');
+    const ch = el('button','b','Проверить'); ch.type='button';
+    const show = el('button','b g','Показать ответ'); show.type='button';
+    const correct = new Set(t.correct);
+    ch.onclick = ()=>{
+      if(state.solved.has(t.id)) return;
+      if(sel.size === 0){ mark(false,'<b>Ничего не отмечено.</b><div class="why">Верных вариантов здесь минимум два.</div>'); return; }
+      bump();
+      const hit = [...sel].filter(i=>correct.has(i)).length, extra = sel.size - hit, miss = correct.size - hit;
+      if(extra === 0 && miss === 0){
+        btns.forEach((x,i)=>{ x.disabled = true; if(correct.has(i)) x.classList.add('right'); });
+        mark(true,'<b>Верно, все варианты на месте.</b><div class="why">'+t.explain+'</div>'); win();
+      }else{
+        mark(false,'<b>Пока не сходится.</b><div class="why">Верных отмечено: '+hit+' из '+correct.size+(extra?'. Лишних: '+extra:'')+'. Снимите или добавьте галочки и проверьте снова.</div>');
+      }
+    };
+    show.onclick = ()=>{
+      state.seen.add(t.id); card.classList.add('seen');
+      btns.forEach((x,i)=>{ x.disabled=true; if(correct.has(i)) x.classList.add(sel.has(i)?'right':'missed'); else if(sel.has(i)) x.classList.add('wrong'); });
+      mark(false,'<b>Верные варианты отмечены зелёным'+(sel.size?', пропущенные — пунктиром':'')+'.</b><div class="why">'+t.explain+'</div>'); refresh();
+    };
+    acts.append(ch, show);
+    if(t.code){
+      const runb = el('button','b g','Запустить фрагмент'); runb.type='button';
+      runb.onclick = ()=> termShow(term, pyRun(t.code, {stdin:(t.stdin||[]).slice()}));
+      acts.append(runb);
+    }
+    card.append(acts, term, verdict); return card;
+  }
+
+  /* ---- предскажи вывод ---- */
+  if(t.type === 'predict'){
+    const pre = el('pre','code'); pre.textContent = t.code; card.append(pre);
+    if(t.stdin && t.stdin.length){
+      const g = el('div','given'); g.append(el('span','lbl','Что вводит пользователь'));
+      const p = el('pre'); p.textContent = t.stdin.join('\n'); g.append(p); card.append(g);
+    }
+    const lbl = el('div','given'); lbl.append(el('span','lbl','Ваш ответ: что появится на экране, строка за строкой'));
+    const ta = el('textarea','answer-box mono'); ta.rows = Math.max(3, t.answer.split('\n').length); ta.spellcheck=false; lbl.append(ta); card.append(lbl);
+    const acts = el('div','acts');
+    const ch = el('button','b','Проверить'); ch.type='button';
+    const show = el('button','b g','Показать ответ'); show.type='button';
+    ch.onclick = ()=>{
+      if(state.solved.has(t.id)) return; bump();
+      if(norm(ta.value) === t.answer){ mark(true,'<b>Точно так.</b><div class="why">'+t.explain+'</div>'); ta.readOnly=true; ch.disabled=true; win(); }
+      else mark(false,'<b>Пока не сходится.</b><div class="why">Сверьте построчно: пробелы, кавычки в списках, регистр True и False, запятые.</div>');
+    };
+    show.onclick = ()=>{ state.seen.add(t.id); card.classList.add('seen'); ta.value = t.answer; ta.readOnly=true; ch.disabled=true; mark(false,'<b>Правильный вывод подставлен в поле.</b><div class="why">'+t.explain+'</div>'); refresh(); };
+    acts.append(ch, show); card.append(acts, verdict); return card;
+  }
+
+  /* ---- код ---- */
+  const first = t.tests[0] || {};
+  if(first.prelude){
+    const g = el('div','given'); g.append(el('span','lbl','Это уже выполнено до вашего кода — переменные готовы'));
+    const p = el('pre'); p.textContent = first.prelude; g.append(p); card.append(g);
+  }
+  if(t.tests.some(x=>x.stdin && x.stdin.length)){
+    const g = el('div','given'); g.append(el('span','lbl','Программу проверят на нескольких вводах, например (строки через «·»)'));
+    const p = el('pre'); p.textContent = t.tests.map(x=>(x.stdin||[]).join(' · ')).join('\n'); g.append(p); card.append(g);
+  }
+  const ta = el('textarea','mono'); ta.value = t.starter || ''; ta.rows = Math.max(4, t.sol.split('\n').length + 2); ta.spellcheck=false;
+  ta.addEventListener('keydown', e=>{
+    if(e.key === 'Tab'){ e.preventDefault(); const s=ta.selectionStart, en=ta.selectionEnd; ta.value = ta.value.slice(0,s)+'    '+ta.value.slice(en); ta.selectionStart=ta.selectionEnd=s+4; }
+    if(e.key === 'Enter' && !e.ctrlKey){
+      const s = ta.selectionStart; const line = ta.value.slice(0,s).split('\n').pop();
+      const ind = (line.match(/^ */)||[''])[0] + (/:\s*$/.test(line) ? '    ' : '');
+      if(ind){ e.preventDefault(); ta.value = ta.value.slice(0,s)+'\n'+ind+ta.value.slice(ta.selectionEnd); ta.selectionStart=ta.selectionEnd=s+1+ind.length; }
+    }
+    if(e.key === 'Enter' && e.ctrlKey){ e.preventDefault(); check(); }
+  });
+  card.append(ta);
+  const term = el('div','term'); term.style.display='none';
+  const acts = el('div','acts');
+  const runb = el('button','b g','Запустить'); runb.type='button';
+  const ch = el('button','b','Проверить'); ch.type='button';
+  const hintb = t.hint ? el('button','b g','Подсказка') : null;
+  const show = el('button','b g','Показать решение'); show.type='button';
+  runb.onclick = ()=>{ const pre = first.prelude ? first.prelude+'\n' : ''; termShow(term, pyRun(pre+ta.value, {stdin:(first.stdin||[]).slice()}), lines(first.prelude)); };
+  function check(){
+    if(state.solved.has(t.id)) return; bump();
+    const res = checkCode(t, ta.value);
+    if(res.ok){ mark(true,'<b>Работает на всех проверках.</b>'+(t.explain?'<div class="why">'+t.explain+'</div>':'')); win(); return; }
+    let html = '<b>'+res.msg+'</b>';
+    if(res.err) html += '<div class="why">Python сказал: <span class="mono">'+esc(res.err)+'</span></div>';
+    if(res.got !== undefined && res.tc){
+      if(res.tc.prelude) html += '<div class="why">Проверка шла при таких данных:<br><span class="mono">'+esc(res.tc.prelude.replace(/\n/g,' ; '))+'</span></div>';
+      else if(res.tc.stdin && res.tc.stdin.length) html += '<div class="why">Ввод был: <span class="mono">'+esc(res.tc.stdin.join(' · '))+'</span></div>';
+      html += '<div class="cmp"><div><span class="lbl">Должно быть</span><pre>'+esc(res.tc.expect)+'</pre></div><div><span class="lbl">Получилось</span><pre>'+esc(res.got)+'</pre></div></div>';
+    }
+    mark(false, html);
+  }
+  ch.onclick = check;
+  if(hintb) hintb.onclick = ()=>{ mark(false,'<b>Подсказка.</b><div class="why">'+t.hint+'</div>'); };
+  show.onclick = ()=>{ state.seen.add(t.id); card.classList.add('seen'); ta.value = t.sol; mark(false,'<b>Готовое решение подставлено.</b><div class="why">Разберите его, запустите и вернитесь к похожему заданию позже.</div>'); refresh(); };
+  acts.append(runb, ch); if(hintb) acts.append(hintb); acts.append(show);
+  card.append(acts, term, verdict); return card;
+}
+
+/* ---------- теория ---------- */
+const THEORY = {
+1:['Символы нумеруются <span class="k">с нуля</span>: в <code>"питон"</code> буква «п» — <code>s[0]</code>, «н» — <code>s[4]</code>. Последний индекс всегда <code>len(s) - 1</code>',
+   'Отрицательные индексы считают с конца: <code>s[-1]</code> — последний символ, <code>s[-2]</code> — предпоследний',
+   'Выход за границы — <code>IndexError</code>. <code>s[len(s)]</code> падает всегда; у пустой строки нет даже <code>s[0]</code>',
+   'Индекс — только целое число: <code>s[1.0]</code> и <code>s["1"]</code> — TypeError',
+   'Строки <span class="k">неизменяемы</span>: <code>s[0] = "A"</code> — TypeError. Новую строку собирают из кусков: <code>"A" + s[1:]</code>. Списки менять по индексу можно',
+   'У списка строк индексы ставятся подряд: <code>words[1][0]</code> — первая буква второго слова'],
+2:['<code>s[a:b]</code> — символы с индекса a <span class="k">до b, не включая b</span>. Длина среза равна b - a',
+   '<code>s[:b]</code> — с начала, <code>s[a:]</code> — до конца, <code>s[:]</code> — вся строка. <code>s[-3:]</code> — последние три символа, <code>s[:-3]</code> — всё, кроме последних трёх',
+   'Третье число — шаг: <code>s[::2]</code> каждый второй, <code>s[::-1]</code> — <span class="k">задом наперёд</span>',
+   'Срез <span class="k">никогда не падает</span>: границы за пределами строки обрезаются, <code>"abc"[5:10]</code> — пустая строка',
+   'Если левая граница не меньше правой при положительном шаге — срез пустой: <code>s[3:3]</code>, <code>s[5:2]</code>',
+   'Всё то же работает со списками, результат — список. Срез всегда создаёт новый объект, исходный не меняется'],
+3:['<code>isdigit()</code> — все символы цифры и строка не пустая: <code>"12.5"</code>, <code>"-3"</code>, <code>""</code>, <code>" 7"</code> дают False. Именно поэтому её ставят перед <code>int()</code>',
+   '<code>isalpha()</code> — только буквы, любого алфавита; пробел, дефис и цифра ломают. <code>isalnum()</code> — буквы и цифры, но <span class="k">не подчёркивание</span> и не пробел',
+   'Методы вызывают <span class="k">со скобками</span>: <code>w.isdigit</code> без скобок — это сам метод, в условии он всегда истинен',
+   '<code>count(x)</code> считает <span class="k">неперекрывающиеся</span> вхождения: <code>"ааа".count("аа")</code> — 1. Регистр различается',
+   '<code>startswith()</code> и <code>endswith()</code> различают регистр: для <code>.JPG</code> сначала <code>lower()</code>. Несколько вариантов — через <code>or</code>, не через <code>endswith(".jpg" or ".png")</code>',
+   '<code>in</code> ищет подстроку где угодно, а <code>endswith</code> — только в конце: <code>".jpg" in "photo.jpg.txt"</code> — True'],
+4:['<code>upper()</code> / <code>lower()</code> — все буквы. <code>capitalize()</code> — первая заглавная, <span class="k">остальные строчные</span>. <code>title()</code> — каждое слово с заглавной, граница слова — любой не-буквенный символ, дефис тоже. <code>swapcase()</code> — меняет регистр каждой буквы',
+   'Методы <span class="k">возвращают новую строку</span> и не трогают старую: <code>s.upper()</code> само по себе ничего не меняет, нужно <code>s = s.upper()</code>',
+   '<code>isupper()</code> / <code>islower()</code> смотрят только на буквы, но требуют хотя бы одну: <code>"123".isupper()</code> — False, <code>"ПРИВЕТ!"</code> — True',
+   'Сравнение без учёта регистра — обе стороны в <code>lower()</code>: <code>a.lower() == b.lower()</code>',
+   'Цифры и знаки препинания ни один метод регистра не меняет'],
+5:['В фигурных скобках — любое выражение: <code>{s.upper()}</code>, <code>{s[::-1]}</code>, <code>{len(s) * 2}</code>, <code>{"о" in s}</code>',
+   'Формат после двоеточия: <code>{x:.2f}</code> — два знака после точки, <code>{x:>6}</code> — ширина 6 вправо, <code>{x:<6}</code> — влево, <code>{x:^6}</code> — по центру, <code>{x:06}</code> — нули слева',
+   'Строка внутри скобок берётся в <span class="k">другие кавычки</span>: <code>f"{s.count(\'а\')}"</code>',
+   '<code>{{</code> и <code>}}</code> печатают сами скобки. Без буквы <code>f</code> скобки — просто текст',
+   'Строку и число складывать нельзя: <code>"n = " + 3</code> — TypeError. Либо f-строка, либо <code>str(3)</code>, либо <code>print("n =", 3)</code>'],
+6:['<code>split()</code> без аргумента режет по любым пробелам и <span class="k">выбрасывает пустые куски</span>; <code>split(", ")</code> режет ровно по заданному разделителю, и лишние пробелы остаются внутри элементов',
+   'Результат <code>split</code> — список строк. <code>"a, b".split(",")</code> даст <code>["a", " b"]</code> — с пробелом',
+   '<code>join</code> вызывается <span class="k">у разделителя</span>, список идёт в скобки: <code>", ".join(words)</code>. У списка метода <code>join</code> нет',
+   'join склеивает <span class="k">только строки</span>: список чисел сначала переводят через <code>str()</code> или печатают иначе — <code>print(*nums, sep=", ")</code>',
+   '<code>"".join(...)</code> — без разделителя, <code>"-".join("abc")</code> — строку тоже можно, получится <code>a-b-c</code>',
+   'Пара <code>split()</code> + <code>" ".join()</code> убирает лишние пробелы, а <code>words[::-1]</code> перед join меняет порядок слов'],
+7:['Схема из задания 5 — читать до стоп-слова:<pre>s = []\nwhile True:\n    word = input()\n    if word == \'СТОП СЛОВО\':\n        break\n    else:\n        s.append(word)\nprint(s)</pre>',
+   '<code>break</code> — <span class="k">единственный выход</span> из <code>while True</code>. Без него цикл бесконечен, а <code>input()</code> упрётся в конец данных',
+   'Всё после <code>if ... break</code> в теле цикла выполняется только для обычных слов, поэтому <code>else</code> можно и не писать',
+   'Счётчик или список создают <span class="k">до цикла</span>, а печатают результат <span class="k">после</span> — без отступа. print с отступом сработает на каждом слове',
+   'Стоп-слово сравнивается точно, с регистром: <code>\'стоп слово\'</code> цикл не остановит',
+   'Типичные накопители: <code>n += 1</code>, <code>total += int(w)</code>, <code>s.append(w)</code>, «самое длинное» через <code>if len(w) > len(longest)</code>'],
+8:['Задание из демоверсии: описано условие словами, нужно отметить <span class="k">все</span> выражения, которые его проверяют — их минимум два',
+   '<code>and</code> выполняется раньше <code>or</code>: <code>a and b or c</code> — это <code>(a and b) or c</code>. Когда сомневаетесь — ставьте скобки',
+   'Правило де Моргана: <code>not (a or b)</code> равно <code>not a and not b</code>; <code>not (a and b)</code> равно <code>not a or not b</code>',
+   '«Не меньше» — <code>&gt;=</code>, «включительно» — нестрогие знаки, «меньше 30» — то же, что <code>not (x &gt;= 30)</code>',
+   'Если переменная бывает только 0 или 1, то <code>x == 0</code>, <code>x != 1</code> и <code>not (x == 1)</code> — одно и то же',
+   'Ловушки в вариантах: <code>=</code> вместо <code>==</code>, <code>or</code> вместо <code>and</code>, метод без скобок, <code>islower()</code> вместо <code>not isupper()</code>'],
+9:['Формат демоверсии: код с номерами строк, описание того, что программа <span class="k">должна</span> делать, ожидаемый вывод и пять утверждений. Верных — минимум два',
+   'Сначала прочитайте ожидаемый вывод и сверьте с ним каждую строку кода. Кнопка «Запустить фрагмент» покажет, где программа падает на самом деле',
+   'Частые настоящие ошибки: <code>=</code> в условии, <code>/</code> вместо <code>//</code>, метод без скобок, неверный разделитель у <code>split</code>, <code>or</code> вместо <code>and</code>, лишний или пропущенный отступ, <code>[::1]</code> вместо <code>[::-1]</code>, индекс <code>s[n]</code>, join по числам',
+   'Частые ложные утверждения: «имя переменной не должно содержать _», «нужен префикс f» там, где нет подстановок, «переменную цикла надо назвать i», «len возвращает строку», «индекс -1 неверен»',
+   'Помните: отсутствие <code>f</code> — ошибка только если в строке есть <code>{}</code>; <code>while True</code> с <code>break</code> — нормальная конструкция; <code>+=</code> — правильный способ увеличить счётчик'],
+10:['Здесь всё сразу: цикл до стоп-слова, проверки строк, регистр, срезы, split и join, f-строки',
+    'Проверяются несколько наборов ввода, включая пустой (сразу стоп-слово) и граничные случаи']
+};
+
+/* ---------- сборка ---------- */
+const main = $('#main'), nav = $('#nav');
+let counter = 0; const navBtns = [];
+chapters.forEach(chp=>{
+  const sec = el('section'); sec.id = 'ch'+chp.n;
+  const sheet = el('div','sheet');
+  const head = el('div','chapter-head'); head.append(el('h2',null,'Глава '+chp.n+'. '+chp.title), el('p',null,chp.lead)); sheet.append(head);
+  const th = el('div','theory'); th.append(el('h3',null,'Что нужно помнить'));
+  const ul = el('ul'); THEORY[chp.n].forEach(t=>{ const li = el('li'); li.innerHTML = t; ul.append(li); }); th.append(ul); sheet.append(th);
+  tasks.filter(t=>t.ch===chp.n).forEach(t=> sheet.append(taskCard(t, ++counter)));
+  const pg = el('div','pager');
+  const prev = el('button','b g','Предыдущая глава'); prev.type='button';
+  const next = el('button','b','Следующая глава'); next.type='button';
+  prev.onclick = ()=> go(chp.n-1); next.onclick = ()=> go(chp.n+1);
+  if(chp.n===1) prev.style.visibility='hidden';
+  if(chp.n===chapters.length) next.textContent='Посмотреть итоги';
+  pg.append(prev,next); sheet.append(pg); sec.append(sheet); main.append(sec);
+  const b = el('button'); b.type='button'; b.append(document.createTextNode(chp.n+'. '+chp.title), el('span','dot','')); b.onclick = ()=> go(chp.n); nav.append(b); navBtns.push(b);
+});
+const resSec = el('section'); resSec.id='ch'+(chapters.length+1); const resSheet = el('div','sheet'); resSec.append(resSheet); main.append(resSec);
+const resBtn = el('button'); resBtn.type='button'; resBtn.textContent='Итоги'; resBtn.onclick=()=>go(chapters.length+1); nav.append(resBtn); navBtns.push(resBtn);
+
+function drawResults(){
+  resSheet.innerHTML = '';
+  const n = state.solved.size;
+  const h = el('div','chapter-head'); h.append(el('h2',null,'Итоги')); resSheet.append(h);
+  const tot = el('div','total'); tot.append(document.createTextNode(n+' '), el('span',null,'из '+TOTAL)); resSheet.append(tot);
+  const sub = el('p'); sub.style.color='var(--ink2)'; sub.style.margin='0';
+  sub.textContent = 'С первой попытки и без подсказок: '+state.firstTry.size+'. Открыто готовых ответов: '+state.seen.size+'.'; resSheet.append(sub);
+  const rows = el('div','rows');
+  chapters.forEach(chp=>{
+    const list = tasks.filter(t=>t.ch===chp.n); const done = list.filter(t=>state.solved.has(t.id)).length;
+    const r = el('div','row'); r.append(el('div',null,'Глава '+chp.n+'. '+chp.title));
+    const mini = el('div','mini'); const i = el('i'); i.style.width=(100*done/list.length)+'%'; mini.append(i);
+    r.append(mini, el('div','cnt',done+'/'+list.length)); rows.append(r);
+  });
+  resSheet.append(rows);
+  const left = tasks.filter(t=>!state.solved.has(t.id));
+  const td = el('div','todo');
+  if(!left.length) td.textContent = 'Все задания решены. Тема закрыта.';
+  else{
+    td.append(document.createTextNode('Осталось разобрать ('+left.length+'). Нажмите номер, чтобы перейти: '));
+    left.forEach(t=>{ const num = tasks.indexOf(t)+1; const b = el('button',null,'№'+num); b.type='button'; b.onclick=()=>{ go(t.ch); document.getElementById(t.id).scrollIntoView({block:'center'}); }; td.append(b); });
+  }
+  resSheet.append(td);
+  const pg = el('div','pager');
+  const back = el('button','b g','Вернуться к главе 1'); back.type='button'; back.onclick=()=>go(1);
+  const reset = el('button','b g','Начать заново'); reset.type='button'; reset.onclick=()=>{ if(confirm('Сбросить все ответы и очистить поля?')) location.reload(); };
+  pg.append(back, reset); resSheet.append(pg);
+}
+let current = 1;
+function go(n){
+  n = Math.max(1, Math.min(chapters.length+1, n)); current = n;
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('on'));
+  document.getElementById('ch'+n).classList.add('on');
+  navBtns.forEach((b,i)=> b.setAttribute('aria-current', String(i+1===n)));
+  if(n===chapters.length+1) drawResults();
+  window.scrollTo(0,0);
+}
+function refresh(){
+  const n = state.solved.size;
+  $('#score').textContent = n; $('#fill').style.width = (100*n/TOTAL)+'%';
+  chapters.forEach((chp,i)=>{ const list = tasks.filter(t=>t.ch===chp.n); const done = list.filter(t=>state.solved.has(t.id)).length; navBtns[i].querySelector('.dot').textContent = done+'/'+list.length; });
+  if(current===chapters.length+1) drawResults();
+}
+refresh(); go(1);
+})();
+</script>
+</body>
+</html>
